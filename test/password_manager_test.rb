@@ -12,10 +12,12 @@ class PasswordManagerTest < Minitest::Test
     Sinatra::Application
   end
 
-  def test_root_page
+  def test_homepage
     get "/"
 
     assert_equal 200, last_response.status
-    assert_includes last_response.body, "Hello world"
+    assert_equal "text/html;charset=utf-8", last_response["Content-Type"]
+    assert_includes last_response.body, "Sign Up"
+    assert_includes last_response.body, "Sign In"
   end
 end

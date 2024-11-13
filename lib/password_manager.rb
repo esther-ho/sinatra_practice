@@ -11,5 +11,5 @@ configure :development do
 end
 
 get "/" do
-  erb "Hello world"
+  erb :home
 end
