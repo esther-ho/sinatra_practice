@@ -7,5 +7,6 @@ gem "webrick"
 gem "erubis"
 gem "minitest"
 gem "rack-test"
+gem "pg"
 
 ruby "3.2.2"
