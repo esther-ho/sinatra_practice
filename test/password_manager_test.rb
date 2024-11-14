@@ -20,4 +20,15 @@ class PasswordManagerTest < Minitest::Test
     assert_includes last_response.body, "Sign Up"
     assert_includes last_response.body, "Sign In"
   end
+
+  def test_sign_up_form
+    get "/users/sign-up"
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, %q(form action="/users" method="post")
+    assert_includes last_response.body, %q(input id="username")
+    assert_includes last_response.body, %q(input id="password")
+    assert_includes last_response.body, %q(input id="repeat_password")
+    assert_includes last_response.body, %q(button type="submit")
+  end
 end

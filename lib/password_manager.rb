@@ -24,3 +24,8 @@ end
 get "/" do
   erb :home
 end
+
+# Render form to sign up as a new user
+get "/users/sign-up" do
+  erb :sign_up
+end
