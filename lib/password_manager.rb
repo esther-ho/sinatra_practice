@@ -66,3 +66,8 @@ post "/users" do
     session[:user] = username
   end
 end
+
+# Render form to sign in as an existing user
+get "/users/sign-in" do
+  erb :sign_in
+end

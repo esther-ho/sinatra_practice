@@ -70,4 +70,14 @@ class PasswordManagerTest < Minitest::Test
     assert_equal 200, last_response.status
     assert_equal "admin", last_request.session[:user]
   end
+
+  def test_sign_in_form
+    get "/users/sign-in"
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, %q(form action="/users/sign-in" method="post")
+    assert_includes last_response.body, %q(input id="username")
+    assert_includes last_response.body, %q(input id="password")
+    assert_includes last_response.body, %q(button type="submit")
+  end
 end

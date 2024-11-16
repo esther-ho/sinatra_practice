@@ -1,0 +1,21 @@
+<h2>Welcome back!</h2>
+<form action="/users/sign-in" method="post">
+  <dl>
+    <dt>
+      <label for="username">Username:</label>
+    </dt>
+    <dd>
+      <input id="username" name="username" type="text" placeholder="Enter your username" value="<%= params[:username] %>" required>
+    </dd>
+  </dl>
+  <dl>
+    <dt>
+      <label for="password">Password:</label>
+    </dt>
+    <dd>
+      <input id="password" name="password" type="password" placeholder="Enter your password" required>
+    </dd>
+  </dl>
+
+  <button type="submit">Sign In</button>
+</form>
