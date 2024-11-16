@@ -69,6 +69,9 @@ class PasswordManagerTest < Minitest::Test
 
     assert_equal 200, last_response.status
     assert_equal "admin", last_request.session[:user]
+
+    assert_nil Validatable.error_for_missing_user("admin", @storage)
+    assert_nil Validatable.error_for_invalid_password("admin", "secret", @storage)
   end
 
   def test_sign_in_form
