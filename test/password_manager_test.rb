@@ -87,4 +87,13 @@ class PasswordManagerTest < Minitest::Test
     assert_equal 422, last_response.status
     assert_includes last_response.body, "User not found."
   end
+
+  def test_sign_in_invalid_password
+    @storage.add_user("admin", BCrypt::Password.create("secret"))
+
+    post "/users/sign-in", { username: "admin", password: "sEcRET" }
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Invalid password."
+  end
 end
