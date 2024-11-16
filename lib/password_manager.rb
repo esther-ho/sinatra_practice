@@ -1,5 +1,6 @@
 require "sinatra"
 require "tilt/erubis"
+require "bcrypt"
 
 require_relative 'database_persistence'
 
@@ -59,5 +60,9 @@ post "/users" do
     status 422
     session[:message] = [username_error, password_error].join(' ')
     erb :sign_up
+  else
+    password_hash = BCrypt::Password.create(password)
+    @storage.add_user(username, password_hash)
+    session[:user] = username
   end
 end
