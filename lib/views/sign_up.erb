@@ -1,0 +1,30 @@
+<form action="/users" method="post">
+  <dl>
+    <dt>
+      <label for="username">Username:</label>
+    </dt>
+    <dd>
+      <input id="username" name="username" type="text" placeholder="Enter your username" value="<%= params[:username] %>" required>
+    </dd>
+  </dl>
+
+  <dl>
+    <dt>
+      <label for="password">Password:</label>
+    </dt>
+    <dd>
+      <input id="password" name="password" type="password" placeholder="Enter your master password" required>
+    </dd>
+  </dl>
+
+  <dl>
+    <dt>
+      <label for="repeat_password">Confirm your master password:</label>
+    </dt>
+    <dd>
+      <input id="repeat_password" name="repeat_password" type="password" placeholder="Confirm your master password" required>
+    </dd>
+  </dl>
+
+  <button type="submit">Create Account</button>
+</form>

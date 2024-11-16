@@ -1,0 +1,17 @@
+body {
+  font: normal 18px Helvetica, Arial, san-serif;
+}
+
+dd {
+  margin: 0;
+}
+
+form input[type="text"],
+form input[type="password"] {
+  width: 70%
+}
+
+.message {
+  background-color: #FFF5DC;
+  padding: 10px;
+}

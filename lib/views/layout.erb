@@ -3,8 +3,17 @@
   <head>
     <title>Password Manager</title>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="/stylesheets/application.css">
   </head>
   <body>
-    <%= yield %>
+    <header>
+      <h1>Password Manager</h1>
+      <% if session[:message] %>
+        <p class="message"><%= session.delete(:message) %></p>
+      <% end %>
+    </header>
+    <main>
+      <%= yield %>
+    </main>
   </body>
 </html>
