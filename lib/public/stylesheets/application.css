@@ -10,3 +10,8 @@ form input[type="text"],
 form input[type="password"] {
   width: 70%
 }
+
+.message {
+  background-color: #FFF5DC;
+  padding: 10px;
+}

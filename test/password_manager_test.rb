@@ -31,4 +31,11 @@ class PasswordManagerTest < Minitest::Test
     assert_includes last_response.body, %q(input id="repeat_password")
     assert_includes last_response.body, %q(button type="submit")
   end
+
+  def test_sign_up_passwords_not_matching
+    post "/users", { username: "admin", password: "123", repeat_password: "456" }
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Passwords do not match."
+  end
 end

@@ -3,6 +3,13 @@ require "tilt/erubis"
 
 require_relative 'database_persistence'
 
+module Validatable
+  # Return an error if passwords do not match. Return nil otherwise.
+  def self.error_for_passwords(password, repeat_password)
+    "Passwords do not match." unless password == repeat_password
+  end
+end
+
 configure do
   enable :sessions
   set :session_secret, SecureRandom.hex(32)
@@ -28,4 +35,19 @@ end
 # Render form to sign up as a new user
 get "/users/sign-up" do
   erb :sign_up
+end
+
+# Add a new user to the database
+post "/users" do
+  username = params[:username]
+  password = params[:password]
+  repeat_password = params[:repeat_password]
+
+  password_error = Validatable.error_for_passwords(password, repeat_password)
+
+  if password_error
+    status 422
+    session[:message] = password_error
+    erb :sign_up
+  end
 end
