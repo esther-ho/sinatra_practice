@@ -6,7 +6,7 @@ require_relative 'database_persistence'
 
 module Validatable
   # Return an error if username is not unique or username only has space characters. Return nil otherwise.
-  def self.error_for_username(username, database)
+  def self.error_for_new_username(username, database)
     if database.find_user(username)
       "Username is already taken."
     elsif username =~ /[^a-zA-Z0-9]/
@@ -15,7 +15,7 @@ module Validatable
   end
 
   # Return an error if passwords do not match. Return nil otherwise.
-  def self.error_for_passwords(password, repeat_password)
+  def self.error_for_new_password(password, repeat_password)
     "Passwords do not match." unless password == repeat_password
   end
 end
@@ -53,8 +53,8 @@ post "/users" do
   password = params[:password]
   repeat_password = params[:repeat_password]
 
-  username_error = Validatable.error_for_username(username, @storage)
-  password_error = Validatable.error_for_passwords(password, repeat_password)
+  username_error = Validatable.error_for_new_username(username, @storage)
+  password_error = Validatable.error_for_new_password(password, repeat_password)
 
   if username_error || password_error
     status 422
