@@ -49,7 +49,7 @@ end
 
 # Add a new user to the database
 post "/users" do
-  username = params[:username]
+  username = params[:username].downcase
   password = params[:password]
   repeat_password = params[:repeat_password]
 
