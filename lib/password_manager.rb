@@ -18,6 +18,11 @@ module Validatable
   def self.error_for_new_password(password, repeat_password)
     "Passwords do not match." unless password == repeat_password
   end
+
+  # Return an error if there is no matching username. Return nil otherwise.
+  def self.error_for_missing_user(username, database)
+    "User not found." unless database.find_user(username)
+  end
 end
 
 configure do
@@ -70,4 +75,17 @@ end
 # Render form to sign in as an existing user
 get "/users/sign-in" do
   erb :sign_in
+end
+
+# Sign in the existing user to their account
+post "/users/sign-in" do
+  username = params[:username].downcase
+  password = params[:password]
+  error = Validatable.error_for_missing_user(username, @storage)
+
+  if error
+    status 422
+    session[:message] = error
+    erb :sign_in
+  end
 end

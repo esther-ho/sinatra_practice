@@ -80,4 +80,11 @@ class PasswordManagerTest < Minitest::Test
     assert_includes last_response.body, %q(input id="password")
     assert_includes last_response.body, %q(button type="submit")
   end
+
+  def test_sign_in_user_not_found
+    post "/users/sign-in", { username: "developer", password: "123" }
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "User not found."
+  end
 end
