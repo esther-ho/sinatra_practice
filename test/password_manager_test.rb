@@ -12,6 +12,15 @@ class PasswordManagerTest < Minitest::Test
     Sinatra::Application
   end
 
+  def setup
+    @storage = DatabasePersistence.new
+  end
+
+  def teardown
+    @storage.delete_all_data
+    @storage.disconnect
+  end
+
   def test_homepage
     get "/"
 

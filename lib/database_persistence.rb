@@ -28,6 +28,11 @@ class DatabasePersistence
     result.first
   end
 
+  # Delete all tables
+  def delete_all_data
+    @db.exec "DELETE FROM users; ALTER SEQUENCE users_id_seq RESTART;"
+  end
+
   private
 
   def query(statement, *params)
