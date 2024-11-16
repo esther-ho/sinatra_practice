@@ -4,9 +4,11 @@ require "tilt/erubis"
 require_relative 'database_persistence'
 
 module Validatable
-  # Return an error if username has non-alphanumeric characters. Return nil otherwise.
-  def self.error_for_username(username)
-    if username =~ /[^a-zA-Z0-9]/
+  # Return an error if username is not unique or username only has space characters. Return nil otherwise.
+  def self.error_for_username(username, database)
+    if database.find_user(username)
+      "Username is already taken."
+    elsif username =~ /[^a-zA-Z0-9]/
       "Username must only contain alphanumeric characters."
     end
   end
@@ -50,7 +52,7 @@ post "/users" do
   password = params[:password]
   repeat_password = params[:repeat_password]
 
-  username_error = Validatable.error_for_username(username)
+  username_error = Validatable.error_for_username(username, @storage)
   password_error = Validatable.error_for_passwords(password, repeat_password)
 
   if username_error || password_error

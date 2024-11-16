@@ -41,6 +41,15 @@ class PasswordManagerTest < Minitest::Test
     assert_includes last_response.body, %q(button type="submit")
   end
 
+  def test_sign_up_username_taken
+    @storage.add_user("admin", "secret")
+
+    post "/users", { username: "admin", password: "123", repeat_password: "123" }
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Username is already taken."
+  end
+
   def test_sign_up_username_with_non_alphanumeric_characters
     post "/users", { username: "admin$1  ", password: "123", repeat_password: "123" }
 
