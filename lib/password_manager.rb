@@ -4,6 +4,13 @@ require "tilt/erubis"
 require_relative 'database_persistence'
 
 module Validatable
+  # Return an error if username has non-alphanumeric characters. Return nil otherwise.
+  def self.error_for_username(username)
+    if username =~ /[^a-zA-Z0-9]/
+      "Username must only contain alphanumeric characters."
+    end
+  end
+
   # Return an error if passwords do not match. Return nil otherwise.
   def self.error_for_passwords(password, repeat_password)
     "Passwords do not match." unless password == repeat_password
@@ -43,11 +50,12 @@ post "/users" do
   password = params[:password]
   repeat_password = params[:repeat_password]
 
+  username_error = Validatable.error_for_username(username)
   password_error = Validatable.error_for_passwords(password, repeat_password)
 
-  if password_error
+  if username_error || password_error
     status 422
-    session[:message] = password_error
+    session[:message] = [username_error, password_error].join(' ')
     erb :sign_up
   end
 end
