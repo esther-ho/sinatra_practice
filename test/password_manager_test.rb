@@ -64,7 +64,7 @@ class PasswordManagerTest < Minitest::Test
     assert_includes last_response.body, "Passwords do not match."
   end
 
-  def test_sign_up
+  def test_valid_sign_up
     post "/users", { username: "admin", password: "secret", repeat_password: "secret" }
 
     assert_equal 200, last_response.status
@@ -97,7 +97,7 @@ class PasswordManagerTest < Minitest::Test
     assert_includes last_response.body, "Invalid password."
   end
 
-  def test_sign_in
+  def test_valid_sign_in
     @storage.add_user("admin", BCrypt::Password.create("secret"))
 
     post "/users/sign-in", { username: "admin", password: "secret" }
