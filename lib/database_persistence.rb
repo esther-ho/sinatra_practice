@@ -1,8 +1,13 @@
 require "pg"
 
 class DatabasePersistence
-  def initialize(logger)
-    @db = PG.connect(dbname: "passwordmanager")
+  def initialize(logger = nil)
+    if ENV["RACK_ENV"] == "test"
+      @db = PG.connect(dbname: "passwordmanagertest")
+    else
+      @db = PG.connect(dbname: "passwordmanager")
+    end
+
     @logger = logger
   end
 
