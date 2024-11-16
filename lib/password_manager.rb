@@ -97,5 +97,7 @@ post "/users/sign-in" do
     status 422
     session[:message] = error
     erb :sign_in
+  else
+    session[:user] = username
   end
 end
