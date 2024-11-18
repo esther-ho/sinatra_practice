@@ -134,4 +134,22 @@ class PasswordManagerTest < Minitest::Test
 
     assert_nil @storage.find_user("developer")
   end
+
+  def test_delete_all_data
+    @storage.add_user("admin", "123")
+
+    user1 = @storage.find_user("admin")
+    assert user1
+    assert_equal "1", user1["id"]
+
+    @storage.delete_all_data
+
+    assert_nil @storage.find_user("admin")
+
+    @storage.add_user("developer", "123")
+
+    user2 = @storage.find_user("developer")
+    assert user2
+    assert_equal "1", user2["id"]
+  end
 end
