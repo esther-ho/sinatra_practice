@@ -42,6 +42,22 @@ class DatabasePersistence
     query(sql, user_id, vault_name)
   end
 
+  # Find a vault with the given vault name of a specific user
+  def find_vault(username, vault_name)
+    user = find_user(username)
+    return unless user
+    user_id = user["id"]
+
+    sql = <<~SQL
+    SELECT * FROM vaults
+    WHERE user_id = $1
+    AND name ILIKE $2
+    SQL
+
+    result = query(sql, user_id, vault_name)
+    result.first
+  end
+
   private
 
   def query(statement, *params)
