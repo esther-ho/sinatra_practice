@@ -33,6 +33,15 @@ class DatabasePersistence
     @db.exec "DELETE FROM users; ALTER SEQUENCE users_id_seq RESTART;"
   end
 
+  # Add a vault associated with a user based on the given username
+  def add_vault(username, vault_name)
+    user = find_user(username)
+    user_id = user["id"]
+
+    sql = "INSERT INTO vaults (user_id, name) VALUES ($1, $2)"
+    query(sql, user_id, vault_name)
+  end
+
   private
 
   def query(statement, *params)
