@@ -30,7 +30,14 @@ class DatabasePersistence
 
   # Delete all tables
   def delete_all_data
-    @db.exec "DELETE FROM users; ALTER SEQUENCE users_id_seq RESTART;"
+    sql = <<~SQL
+    DELETE FROM users;
+    ALTER SEQUENCE users_id_seq RESTART;
+    DELETE FROM vaults;
+    ALTER SEQUENCE vaults_id_seq RESTART;
+    SQL
+
+    @db.exec(sql)
   end
 
   # Add a vault associated with a user based on the given username
