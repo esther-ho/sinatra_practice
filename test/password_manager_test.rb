@@ -21,6 +21,8 @@ class PasswordManagerTest < Minitest::Test
     @storage.disconnect
   end
 
+  # Test routes
+
   def test_homepage
     get "/"
 
@@ -107,5 +109,18 @@ class PasswordManagerTest < Minitest::Test
 
     assert_equal 200, last_response.status
     assert_equal "admin", last_request.session[:user]
+  end
+
+  # Test database functionality
+
+  def test_add_user
+    assert_nil @storage.find_user("admin")
+
+    @storage.add_user("admin", "123")
+    user = @storage.find_user("admin")
+
+    assert user
+    assert_equal "123", user["password_hash"]
+  end
   end
 end
