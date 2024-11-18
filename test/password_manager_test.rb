@@ -137,19 +137,32 @@ class PasswordManagerTest < Minitest::Test
 
   def test_delete_all_data
     @storage.add_user("admin", "123")
+    @storage.add_vault("admin", "My Vault")
 
     user1 = @storage.find_user("admin")
+    vault1 = @storage.find_vault("admin", "my vault")
+
     assert user1
     assert_equal "1", user1["id"]
+    assert_equal "1", vault1["id"]
+    assert_equal vault1["user_id"], user1["id"]
+    assert_equal "My Vault", vault1["name"]
 
     @storage.delete_all_data
 
+    assert_nil @storage.find_vault("admin", "my vault")
     assert_nil @storage.find_user("admin")
 
     @storage.add_user("developer", "123")
+    @storage.add_vault("developer", "My Vault")
 
     user2 = @storage.find_user("developer")
+    vault2 = @storage.find_vault("developer", "my vault")
+
     assert user2
     assert_equal "1", user2["id"]
+    assert_equal "1", vault2["id"]
+    assert_equal vault2["user_id"], user2["id"]
+    assert_equal "My Vault", vault2["name"]
   end
 end
