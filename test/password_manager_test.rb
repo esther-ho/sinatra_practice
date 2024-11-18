@@ -122,5 +122,16 @@ class PasswordManagerTest < Minitest::Test
     assert user
     assert_equal "123", user["password_hash"]
   end
+
+  def test_find_user
+    @storage.add_user("admin", "123")
+
+    user = @storage.find_user("admin")
+
+    assert user
+    assert_equal "admin", user["username"]
+    assert_equal "123", user["password_hash"]
+
+    assert_nil @storage.find_user("developer")
   end
 end
