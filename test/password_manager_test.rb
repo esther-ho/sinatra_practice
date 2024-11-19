@@ -76,6 +76,15 @@ class PasswordManagerTest < Minitest::Test
     assert_nil Validatable.error_for_invalid_password("admin", "secret", @storage)
   end
 
+  def test_create_vault_on_sign_up
+    post "/users", { username: "admin", password: "secret", repeat_password: "secret" }
+
+    assert_equal 200, last_response.status
+
+    user = @storage.find_user("admin")
+    assert @storage.find_vault(user["id"], "My Vault")
+  end
+
   def test_sign_in_form
     get "/users/sign-in"
 
