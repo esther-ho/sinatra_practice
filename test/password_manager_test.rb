@@ -76,6 +76,15 @@ class PasswordManagerTest < Minitest::Test
     assert_nil Validatable.error_for_invalid_password("admin", "secret", @storage)
   end
 
+  def test_create_vault_on_sign_up
+    post "/users", { username: "admin", password: "secret", repeat_password: "secret" }
+
+    assert_equal 200, last_response.status
+
+    user = @storage.find_user("admin")
+    assert @storage.find_vault(user["id"], "My Vault")
+  end
+
   def test_sign_in_form
     get "/users/sign-in"
 
@@ -137,19 +146,63 @@ class PasswordManagerTest < Minitest::Test
 
   def test_delete_all_data
     @storage.add_user("admin", "123")
+    @storage.add_vault(1, "My Vault")
 
     user1 = @storage.find_user("admin")
+    vault1 = @storage.find_vault(1, "My vault")
+
     assert user1
     assert_equal "1", user1["id"]
+
+    assert vault1
+    assert_equal "1", vault1["id"]
 
     @storage.delete_all_data
 
     assert_nil @storage.find_user("admin")
+    assert_nil @storage.find_vault(1, "My Vault")
 
     @storage.add_user("developer", "123")
+    @storage.add_vault(1, "My Vault")
 
     user2 = @storage.find_user("developer")
+    vault2 = @storage.find_vault(1, "My Vault")
+
     assert user2
     assert_equal "1", user2["id"]
+
+    assert vault2
+    assert_equal "1", vault2["id"]
+  end
+
+  def test_add_vault_with_valid_user_id
+    @storage.add_user("admin", "123")
+    @storage.add_vault(1, "My Vault")
+
+    vault = @storage.find_vault(1, "My Vault")
+    assert vault
+    assert_equal "1", vault["user_id"]
+    assert_equal "My Vault", vault["name"]
+  end
+
+  def test_add_vault_without_valid_user_id
+    assert_raises PG::ForeignKeyViolation do
+      @storage.add_vault(1, "My Vault")
+    end
+
+    assert_nil @storage.find_vault(1, "My Vault")
+  end
+
+  def test_find_vault_with_valid_user_id
+    @storage.add_user("admin", "123")
+    @storage.add_vault(1, "My Vault")
+
+    assert @storage.find_vault(1, "My Vault")
+    assert @storage.find_vault(1, "my vault")
+    assert_nil @storage.find_vault(1, "test vault")
+  end
+
+  def test_find_vault_without_valid_user_id
+    assert_nil @storage.find_vault(1, "my vault")
   end
 end

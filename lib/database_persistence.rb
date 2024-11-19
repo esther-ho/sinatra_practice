@@ -30,7 +30,27 @@ class DatabasePersistence
 
   # Delete all tables
   def delete_all_data
-    @db.exec "DELETE FROM users; ALTER SEQUENCE users_id_seq RESTART;"
+    sql = <<~SQL
+    DELETE FROM users;
+    ALTER SEQUENCE users_id_seq RESTART;
+    DELETE FROM vaults;
+    ALTER SEQUENCE vaults_id_seq RESTART;
+    SQL
+
+    @db.exec(sql)
+  end
+
+  # Add a vault associated with a user based on the given user id
+  def add_vault(user_id, vault_name)
+    sql = "INSERT INTO vaults (user_id, name) VALUES ($1, $2)"
+    query(sql, user_id, vault_name)
+  end
+
+  # Find a vault with the given vault name of a specific user
+  def find_vault(user_id, vault_name)
+    sql = "SELECT * FROM vaults WHERE user_id = $1 AND name ILIKE $2"
+    result = query(sql, user_id, vault_name)
+    result.first
   end
 
   private

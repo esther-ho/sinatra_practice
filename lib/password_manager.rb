@@ -77,6 +77,11 @@ post "/users" do
   else
     password_hash = BCrypt::Password.create(password)
     @storage.add_user(username, password_hash)
+
+    user = @storage.find_user(username)
+    user_id = user["id"]
+    @storage.add_vault(user_id, "My Vault")
+
     session[:user] = username
   end
 end
