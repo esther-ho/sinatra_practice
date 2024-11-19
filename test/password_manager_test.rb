@@ -165,4 +165,22 @@ class PasswordManagerTest < Minitest::Test
     assert vault2
     assert_equal "1", vault2["id"]
   end
+
+  def test_add_vault_with_valid_user_id
+    @storage.add_user("admin", "123")
+    @storage.add_vault(1, "My Vault")
+
+    vault = @storage.find_vault(1, "My Vault")
+    assert vault
+    assert_equal "1", vault["user_id"]
+    assert_equal "My Vault", vault["name"]
+  end
+
+  def test_add_vault_without_valid_user_id
+    assert_raises PG::ForeignKeyViolation do
+      @storage.add_vault(1, "My Vault")
+    end
+
+    assert_nil @storage.find_vault(1, "My Vault")
+  end
 end
