@@ -183,4 +183,17 @@ class PasswordManagerTest < Minitest::Test
 
     assert_nil @storage.find_vault(1, "My Vault")
   end
+
+  def test_find_vault_with_valid_user_id
+    @storage.add_user("admin", "123")
+    @storage.add_vault(1, "My Vault")
+
+    assert @storage.find_vault(1, "My Vault")
+    assert @storage.find_vault(1, "my vault")
+    assert_nil @storage.find_vault(1, "test vault")
+  end
+
+  def test_find_vault_without_valid_user_id
+    assert_nil @storage.find_vault(1, "my vault")
+  end
 end
