@@ -1,22 +1,25 @@
 require "pg"
 
 class DatabasePersistence
-  def initialize(logger = nil)
+  @@db = nil
+  @@logger = nil
+
+  def self.connect(logger = nil)
     if ENV["RACK_ENV"] == "test"
-      @db = PG.connect(dbname: "passwordmanagertest")
+      @@db = PG.connect(dbname: "passwordmanagertest")
     else
-      @db = PG.connect(dbname: "passwordmanager")
+      @@db = PG.connect(dbname: "passwordmanager")
     end
 
-    @logger = logger
+    @@logger = logger
   end
 
-  def disconnect
-    @db.close
+  def self.disconnect
+    @@db.close
   end
 
   # Delete all tables
-  def delete_all_data
+  def self.delete_all_data
     sql = <<~SQL
     DELETE FROM users;
     ALTER SEQUENCE users_id_seq RESTART;
@@ -24,13 +27,11 @@ class DatabasePersistence
     ALTER SEQUENCE vaults_id_seq RESTART;
     SQL
 
-    @db.exec(sql)
+    @@db.exec(sql)
   end
 
-  private
-
-  def query(statement, *params)
-    @logger&.info "#{statement}: #{params}"
-    @db.exec_params(statement, params)
+  def self.query(statement, *params)
+    @@logger&.info "#{statement}: #{params}"
+    @@db.exec_params(statement, params)
   end
 end
