@@ -9,6 +9,20 @@ class User
   def self.find_by_username(username)
     sql = "SELECT * FROM users WHERE username = $1"
     result = DatabaseAccessor.query(sql, username)
-    result.first
+    tuple = result.first
+
+    create_user_from_tuple(tuple) if tuple
+  end
+
+  class << self
+    private
+
+    # Instantiate a new `User` object
+    # Set its instance variables based on attributes and values from the tuple
+    def create_user_from_tuple(tuple)
+      user = new
+      tuple.each { |k, v| user.instance_variable_set("@#{k}", v) }
+      user
+    end
   end
 end
