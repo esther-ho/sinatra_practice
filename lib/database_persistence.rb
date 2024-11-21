@@ -13,8 +13,8 @@ class DatabasePersistence
     @@db.close
   end
 
-  # Delete all tables
-  def self.delete_all_data
+  # Delete all data in tables and reset id sequences to 1
+  def self.reset
     sql = <<~SQL
     DELETE FROM users;
     ALTER SEQUENCE users_id_seq RESTART;
