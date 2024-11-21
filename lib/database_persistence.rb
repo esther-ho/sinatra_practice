@@ -6,7 +6,7 @@ class DatabasePersistence
 
   def self.connect(logger = nil)
     @@db = PG.connect(dbname: load_database)
-    @@logger = logger
+    @@logger ||= logger
   end
 
   def self.disconnect
@@ -26,6 +26,8 @@ class DatabasePersistence
   end
 
   def self.query(statement, *params)
+    ensure_connection
+
     @@logger&.info "#{statement}: #{params}"
     @@db.exec_params(statement, params)
   end
@@ -35,6 +37,10 @@ class DatabasePersistence
 
     def load_database
       ENV["RACK_ENV"] == "test" ? "passwordmanagertest" : "passwordmanager"
+    end
+
+    def ensure_connection
+      connect if @@db.nil? || @@db.finished?
     end
   end
 end
