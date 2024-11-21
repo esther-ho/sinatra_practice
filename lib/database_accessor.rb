@@ -1,6 +1,6 @@
 require "pg"
 
-class DatabasePersistence
+class DatabaseAccessor
   @@db = nil
   @@logger = nil
 
