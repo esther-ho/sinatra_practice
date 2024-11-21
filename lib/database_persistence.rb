@@ -15,19 +15,6 @@ class DatabasePersistence
     @db.close
   end
 
-  # Add a new user to the `users` table
-  def add_user(username, password)
-    sql = "INSERT INTO users (username, password_hash) VALUES ($1, $2)"
-    query(sql, username, password)
-  end
-
-  # Find a user from the `users` table based on the given username
-  def find_user(username)
-    sql = "SELECT * FROM users WHERE username = $1"
-    result = query(sql, username)
-    result.first
-  end
-
   # Delete all tables
   def delete_all_data
     sql = <<~SQL
@@ -38,19 +25,6 @@ class DatabasePersistence
     SQL
 
     @db.exec(sql)
-  end
-
-  # Add a vault associated with a user based on the given user id
-  def add_vault(user_id, vault_name)
-    sql = "INSERT INTO vaults (user_id, name) VALUES ($1, $2)"
-    query(sql, user_id, vault_name)
-  end
-
-  # Find a vault with the given vault name of a specific user
-  def find_vault(user_id, vault_name)
-    sql = "SELECT * FROM vaults WHERE user_id = $1 AND name ILIKE $2"
-    result = query(sql, user_id, vault_name)
-    result.first
   end
 
   private
