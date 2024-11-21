@@ -15,6 +15,8 @@ class DatabaseAccessor
 
   # Delete all data in tables and reset id sequences to 1
   def self.reset
+    ensure_connection
+
     sql = <<~SQL
     DELETE FROM users;
     ALTER SEQUENCE users_id_seq RESTART;
