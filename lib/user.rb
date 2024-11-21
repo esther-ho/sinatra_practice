@@ -1,4 +1,13 @@
+require "bcrypt"
+
 class User
+  include BCrypt
+
+  # If a user is found, check that the passwords match
+  def self.login(username, password)
+    find_by_username(username)&.authenticate(password)
+  end
+
   # Add a new user to the `users` table
   def self.add(username, password)
     sql = "INSERT INTO users (username, password_hash) VALUES ($1, $2)"
@@ -12,6 +21,11 @@ class User
     tuple = result.first
 
     create_user_from_tuple(tuple) if tuple
+  end
+
+  # Check if the given password matches the user's hashed password
+  def authenticate(password)
+    Password.new(@password_hash) == password ? self : false
   end
 
   class << self
