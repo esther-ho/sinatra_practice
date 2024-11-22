@@ -2,7 +2,7 @@ require "sinatra"
 require "tilt/erubis"
 require "bcrypt"
 
-require_relative 'database_persistence'
+require_relative "database_accessor"
 
 module Validatable
   # Return an error if username is not unique or username only has space characters. Return nil otherwise.
@@ -41,15 +41,15 @@ end
 
 configure :development do
   require "sinatra/reloader"
-  also_reload "database_persistence.rb"
+  also_reload "database_accessor.rb"
 end
 
 before do
-  @storage = DatabasePersistence.new(logger)
+  DatabaseAccessor.connect(logger)
 end
 
 after do
-  @storage.disconnect
+  DatabaseAccessor.disconnect
 end
 
 get "/" do

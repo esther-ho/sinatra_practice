@@ -13,12 +13,12 @@ class PasswordManagerTest < Minitest::Test
   end
 
   def setup
-    @storage = DatabasePersistence.new
+    DatabaseAccessor.connect
   end
 
   def teardown
-    @storage.delete_all_data
-    @storage.disconnect
+    DatabaseAccessor.reset
+    DatabaseAccessor.disconnect
   end
 
   # Test routes
@@ -157,7 +157,7 @@ class PasswordManagerTest < Minitest::Test
     assert vault1
     assert_equal "1", vault1["id"]
 
-    @storage.delete_all_data
+    DatabaseAccessor.reset
 
     assert_nil @storage.find_user("admin")
     assert_nil @storage.find_vault(1, "My Vault")
