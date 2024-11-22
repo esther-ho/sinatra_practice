@@ -33,6 +33,11 @@ class User
     Password.new(@password_hash) == password ? self : false
   end
 
+  # Store only the `id` and `username` of a user in a session
+  def session_hash
+    { id: @id, username: @username }
+  end
+
   class << self
     private
 
