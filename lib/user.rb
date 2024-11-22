@@ -5,6 +5,10 @@ class LoginError < StandardError; end
 class User
   include BCrypt
 
+  def initialize(*options)
+    set_attributes(*options) unless options.empty?
+  end
+
   # If the user is not found and/or passwords don't match, raise LoginError
   # Otherwise, return the `User` instance
   def self.login(username, password)
@@ -20,12 +24,14 @@ class User
   end
 
   # Find a user from the `users` table based on the given username
+  # Instantiate a new `User` object if a valid user is found
+  # Set its instance variables based on attributes and values from the tuple
   def self.find_by_username(username)
     sql = "SELECT * FROM users WHERE username = $1"
     result = DatabaseAccessor.query(sql, username)
     tuple = result.first
 
-    create_user_from_tuple(tuple) if tuple
+    new(tuple) if tuple
   end
 
   # Check if the given password matches the user's hashed password
@@ -38,15 +44,11 @@ class User
     { id: @id, username: @username }
   end
 
-  class << self
-    private
+  private
 
-    # Instantiate a new `User` object
-    # Set its instance variables based on attributes and values from the tuple
-    def create_user_from_tuple(tuple)
-      user = new
-      tuple.each { |k, v| user.instance_variable_set("@#{k}", v) }
-      user
+  def set_attributes(options)
+    options.each do |attribute, value|
+      instance_variable_set("@#{attribute}", value)
     end
   end
 end
