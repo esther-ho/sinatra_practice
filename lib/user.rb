@@ -1,11 +1,16 @@
 require "bcrypt"
 
+class LoginError < StandardError; end
+
 class User
   include BCrypt
 
-  # If a user is found, check that the passwords match
+  # If the user is not found and/or passwords don't match, raise LoginError
+  # Otherwise, return the `User` instance
   def self.login(username, password)
-    find_by_username(username)&.authenticate(password)
+    valid_user = find_by_username(username)&.authenticate(password)
+    raise LoginError, "Invalid username and/or password." unless valid_user
+    valid_user
   end
 
   # Add a new user to the `users` table
