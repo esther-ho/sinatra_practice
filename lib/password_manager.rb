@@ -3,6 +3,7 @@ require "tilt/erubis"
 require "bcrypt"
 
 require_relative "database_accessor"
+require_relative "user"
 
 module Validatable
   # Return an error if username is not unique or username only has space characters. Return nil otherwise.
@@ -42,6 +43,7 @@ end
 configure :development do
   require "sinatra/reloader"
   also_reload "database_accessor.rb"
+  also_reload "user.rb"
 end
 
 before do
