@@ -44,11 +44,33 @@ class User
     { id: @id, username: @username }
   end
 
+  def validate(*attributes)
+    @errors ||= []
+
+    attributes.each { |attribute| send("#{attribute}_validation") }
+  end
+
   private
 
   def set_attributes(options)
     options.each do |attribute, value|
       instance_variable_set("@#{attribute}", value)
+    end
+  end
+
+  # Add error if username is not unique or has non-alphanumeric characters.
+  def username_validation
+    if self.class.find_by_username(@username)
+      @errors << "Username is already taken."
+    elsif @username =~ /[^a-zA-Z0-9]/
+      @errors << "Username must only contain alphanumeric characters."
+    end
+  end
+
+  # Add error if passwords do not match
+  def password_validation
+    unless @password == @repeat_password
+      @errors << "Passwords do not match."
     end
   end
 end
