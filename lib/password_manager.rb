@@ -1,6 +1,5 @@
 require "sinatra"
 require "tilt/erubis"
-require "bcrypt"
 
 require_relative "database_accessor"
 require_relative "user"
