@@ -1,12 +1,30 @@
 require "bcrypt"
 
 class LoginError < StandardError; end
+class SignupError < StandardError; end
 
 class User
   include BCrypt
 
+  attr_reader :errors, :username, :password
+
   def initialize(*options)
     set_attributes(*options) unless options.empty?
+  end
+
+  # If the user has an invalid username and/or passwords, raise SignupError
+  # Otherwise, add the user to the database and return the `User` instance
+  def self.create(*options)
+    user = new(*options)
+    user.validate(:username, :password)
+
+    if user.errors.empty?
+      add(user.username, user.password)
+    else
+      raise SignupError, user.errors.join(' ')
+    end
+
+    find_by_username(user.username)
   end
 
   # If the user is not found and/or passwords don't match, raise LoginError
