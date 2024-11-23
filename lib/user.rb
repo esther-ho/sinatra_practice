@@ -19,8 +19,10 @@ class User
 
   # Add a new user to the `users` table
   def self.add(username, password)
+    password_hash = Password.create(password)
+
     sql = "INSERT INTO users (username, password_hash) VALUES ($1, $2)"
-    DatabaseAccessor.query(sql, username, password)
+    DatabaseAccessor.query(sql, username, password_hash)
   end
 
   # Find a user from the `users` table based on the given username
