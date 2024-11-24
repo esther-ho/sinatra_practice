@@ -6,20 +6,6 @@ require_relative "user"
 require_relative "vault"
 
 module Validatable
-  # Return an error if username is not unique or username only has space characters. Return nil otherwise.
-  def self.error_for_new_username(username, database)
-    if database.find_user(username)
-      "Username is already taken."
-    elsif username =~ /[^a-zA-Z0-9]/
-      "Username must only contain alphanumeric characters."
-    end
-  end
-
-  # Return an error if passwords do not match. Return nil otherwise.
-  def self.error_for_new_password(password, repeat_password)
-    "Passwords do not match." unless password == repeat_password
-  end
-
   # Return an error if there is no matching username. Return nil otherwise.
   def self.error_for_missing_user(username, database)
     "User not found." unless database.find_user(username)
@@ -70,22 +56,22 @@ post "/users" do
   password = params[:password]
   repeat_password = params[:repeat_password]
 
-  username_error = Validatable.error_for_new_username(username, @storage)
-  password_error = Validatable.error_for_new_password(password, repeat_password)
+  begin
+    user = User.create(
+      username: username,
+      password: password,
+      repeat_password: repeat_password
+    )
+  rescue SignupError => error
+  end
 
-  if username_error || password_error
+  if error
     status 422
-    session[:message] = [username_error, password_error].join(' ')
+    session[:message] = error
     erb :sign_up
   else
-    password_hash = BCrypt::Password.create(password)
-    @storage.add_user(username, password_hash)
-
-    user = @storage.find_user(username)
-    user_id = user["id"]
-    @storage.add_vault(user_id, "My Vault")
-
-    session[:user] = username
+    Vault.add(user.id, "My Vault")
+    session[:user] = user.session_hash
   end
 end
 

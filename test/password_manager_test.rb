@@ -44,7 +44,7 @@ class PasswordManagerTest < Minitest::Test
   end
 
   def test_sign_up_username_taken
-    @storage.add_user("admin", BCrypt::Password.create("secret"))
+    User.add("admin", "secret")
 
     post "/users", { username: "admin", password: "123", repeat_password: "123" }
 
@@ -70,10 +70,11 @@ class PasswordManagerTest < Minitest::Test
     post "/users", { username: "admin", password: "secret", repeat_password: "secret" }
 
     assert_equal 200, last_response.status
-    assert_equal "admin", last_request.session[:user]
+    assert_equal ({id: "1", username: "admin"}), last_request.session[:user]
 
-    assert_nil Validatable.error_for_missing_user("admin", @storage)
-    assert_nil Validatable.error_for_invalid_password("admin", "secret", @storage)
+    user = User.find_by_username("admin")
+    assert user
+    assert user.authenticate("secret")
   end
 
   def test_create_vault_on_sign_up
@@ -81,8 +82,8 @@ class PasswordManagerTest < Minitest::Test
 
     assert_equal 200, last_response.status
 
-    user = @storage.find_user("admin")
-    assert @storage.find_vault(user["id"], "My Vault")
+    user = User.find_by_username("admin")
+    assert Vault.find_by_vault_name(user.id, "My Vault")
   end
 
   def test_sign_in_form
