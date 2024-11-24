@@ -25,6 +25,14 @@ class UserTest < Minitest::Test
     assert user.authenticate("123")
   end
 
+  def test_add_duplicate_user
+    User.add("admin", "123")
+
+    assert_raises PG::UniqueViolation do
+      User.add("admin", "345")
+    end
+  end
+
   def test_find_user
     User.add("admin", "123")
 
