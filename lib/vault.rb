@@ -10,10 +10,13 @@ class Vault
   end
 
   # Find a vault with the given vault name of a specific user
+  # Instantiate a new `Vault` object if a valid vault is found
   def self.find_by_vault_name(user_id, vault_name)
     sql = "SELECT * FROM vaults WHERE user_id = $1 AND name ILIKE $2"
     result = DatabaseAccessor.query(sql, user_id, vault_name)
-    result.first
+    tuple = result.first
+
+    new(tuple) if tuple
   end
 
   private
