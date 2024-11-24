@@ -1,4 +1,6 @@
 class Vault
+  attr_reader :id, :name, :user_id
+
   def initialize(*options)
     set_attributes(*options) unless options.empty?
   end
