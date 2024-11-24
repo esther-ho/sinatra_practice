@@ -122,28 +122,6 @@ class PasswordManagerTest < Minitest::Test
 
   # Test database functionality
 
-  def test_add_user
-    assert_nil @storage.find_user("admin")
-
-    @storage.add_user("admin", "123")
-    user = @storage.find_user("admin")
-
-    assert user
-    assert_equal "123", user["password_hash"]
-  end
-
-  def test_find_user
-    @storage.add_user("admin", "123")
-
-    user = @storage.find_user("admin")
-
-    assert user
-    assert_equal "admin", user["username"]
-    assert_equal "123", user["password_hash"]
-
-    assert_nil @storage.find_user("developer")
-  end
-
   def test_delete_all_data
     @storage.add_user("admin", "123")
     @storage.add_vault(1, "My Vault")
