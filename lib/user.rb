@@ -6,7 +6,7 @@ class SignupError < StandardError; end
 class User
   include BCrypt
 
-  attr_reader :errors, :username, :password
+  attr_reader :errors, :id, :username, :password
 
   def initialize(*options)
     set_attributes(*options) unless options.empty?
