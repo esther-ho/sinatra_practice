@@ -1,4 +1,8 @@
 class Vault
+  def initialize(*options)
+    set_attributes(*options) unless options.empty?
+  end
+
   # Add a vault associated with a user based on the given user id
   def self.add(user_id, vault_name)
     sql = "INSERT INTO vaults (user_id, name) VALUES ($1, $2)"
@@ -10,5 +14,13 @@ class Vault
     sql = "SELECT * FROM vaults WHERE user_id = $1 AND name ILIKE $2"
     result = DatabaseAccessor.query(sql, user_id, vault_name)
     result.first
+  end
+
+  private
+
+  def set_attributes(options)
+    options.each do |attribute, value|
+      instance_variable_set("@#{attribute}", value)
+    end
   end
 end
