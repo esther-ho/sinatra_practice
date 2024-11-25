@@ -100,24 +100,24 @@ class PasswordManagerTest < Minitest::Test
     post "/users/sign-in", { username: "developer", password: "123" }
 
     assert_equal 422, last_response.status
-    assert_includes last_response.body, "User not found."
+    assert_includes last_response.body, "Invalid username and/or password."
   end
 
   def test_sign_in_invalid_password
-    @storage.add_user("admin", BCrypt::Password.create("secret"))
+    User.add("admin", "secret")
 
     post "/users/sign-in", { username: "admin", password: "sEcRET" }
 
     assert_equal 422, last_response.status
-    assert_includes last_response.body, "Invalid password."
+    assert_includes last_response.body, "Invalid username and/or password."
   end
 
   def test_valid_sign_in
-    @storage.add_user("admin", BCrypt::Password.create("secret"))
+    User.add("admin", "secret")
 
     post "/users/sign-in", { username: "admin", password: "secret" }
 
     assert_equal 200, last_response.status
-    assert_equal "admin", last_request.session[:user]
+    assert_equal ({id: "1", username: "admin"}), last_request.session[:user]
   end
 end

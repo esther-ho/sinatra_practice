@@ -5,22 +5,6 @@ require_relative "database_accessor"
 require_relative "user"
 require_relative "vault"
 
-module Validatable
-  # Return an error if there is no matching username. Return nil otherwise.
-  def self.error_for_missing_user(username, database)
-    "User not found." unless database.find_user(username)
-  end
-
-  # Return an error if the given password doesn't match the stored password.
-  # Return nil otherwise.
-  def self.error_for_invalid_password(username, given_password, database)
-    user = database.find_user(username)
-    hashed_password = user["password_hash"]
-    password_match = (BCrypt::Password.new(hashed_password) == given_password)
-    "Invalid password." unless password_match
-  end
-end
-
 configure do
   enable :sessions
   set :session_secret, SecureRandom.hex(32)
@@ -84,14 +68,17 @@ end
 post "/users/sign-in" do
   username = params[:username].downcase
   password = params[:password]
-  error = Validatable.error_for_missing_user(username, @storage) ||
-          Validatable.error_for_invalid_password(username, password, @storage)
+
+  begin
+    user = User.login(username, password)
+  rescue LoginError => error
+  end
 
   if error
     status 422
     session[:message] = error
     erb :sign_in
   else
-    session[:user] = username
+    session[:user] = user.session_hash
   end
 end
