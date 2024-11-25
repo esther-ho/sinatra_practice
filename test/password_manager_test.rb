@@ -21,8 +21,6 @@ class PasswordManagerTest < Minitest::Test
     DatabaseAccessor.disconnect
   end
 
-  # Test routes
-
   def test_homepage
     get "/"
 
