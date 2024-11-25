@@ -1,38 +1,9 @@
 require "sinatra"
 require "tilt/erubis"
-require "bcrypt"
 
-require_relative 'database_persistence'
-
-module Validatable
-  # Return an error if username is not unique or username only has space characters. Return nil otherwise.
-  def self.error_for_new_username(username, database)
-    if database.find_user(username)
-      "Username is already taken."
-    elsif username =~ /[^a-zA-Z0-9]/
-      "Username must only contain alphanumeric characters."
-    end
-  end
-
-  # Return an error if passwords do not match. Return nil otherwise.
-  def self.error_for_new_password(password, repeat_password)
-    "Passwords do not match." unless password == repeat_password
-  end
-
-  # Return an error if there is no matching username. Return nil otherwise.
-  def self.error_for_missing_user(username, database)
-    "User not found." unless database.find_user(username)
-  end
-
-  # Return an error if the given password doesn't match the stored password.
-  # Return nil otherwise.
-  def self.error_for_invalid_password(username, given_password, database)
-    user = database.find_user(username)
-    hashed_password = user["password_hash"]
-    password_match = (BCrypt::Password.new(hashed_password) == given_password)
-    "Invalid password." unless password_match
-  end
-end
+require_relative "database_accessor"
+require_relative "user"
+require_relative "vault"
 
 configure do
   enable :sessions
@@ -41,15 +12,17 @@ end
 
 configure :development do
   require "sinatra/reloader"
-  also_reload "database_persistence.rb"
+  also_reload "database_accessor.rb"
+  also_reload "user.rb"
+  also_reload "vault.rb"
 end
 
 before do
-  @storage = DatabasePersistence.new(logger)
+  DatabaseAccessor.connect(logger)
 end
 
 after do
-  @storage.disconnect
+  DatabaseAccessor.disconnect
 end
 
 get "/" do
@@ -67,22 +40,22 @@ post "/users" do
   password = params[:password]
   repeat_password = params[:repeat_password]
 
-  username_error = Validatable.error_for_new_username(username, @storage)
-  password_error = Validatable.error_for_new_password(password, repeat_password)
+  begin
+    user = User.create(
+      username: username,
+      password: password,
+      repeat_password: repeat_password
+    )
+  rescue SignupError => error
+  end
 
-  if username_error || password_error
+  if error
     status 422
-    session[:message] = [username_error, password_error].join(' ')
+    session[:message] = error
     erb :sign_up
   else
-    password_hash = BCrypt::Password.create(password)
-    @storage.add_user(username, password_hash)
-
-    user = @storage.find_user(username)
-    user_id = user["id"]
-    @storage.add_vault(user_id, "My Vault")
-
-    session[:user] = username
+    Vault.add(user.id, "My Vault")
+    session[:user] = user.session_hash
   end
 end
 
@@ -95,14 +68,17 @@ end
 post "/users/sign-in" do
   username = params[:username].downcase
   password = params[:password]
-  error = Validatable.error_for_missing_user(username, @storage) ||
-          Validatable.error_for_invalid_password(username, password, @storage)
+
+  begin
+    user = User.login(username, password)
+  rescue LoginError => error
+  end
 
   if error
     status 422
     session[:message] = error
     erb :sign_in
   else
-    session[:user] = username
+    session[:user] = user.session_hash
   end
 end
