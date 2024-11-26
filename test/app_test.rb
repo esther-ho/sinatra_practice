@@ -3,9 +3,9 @@ ENV["RACK_ENV"] = "test"
 require "minitest/autorun"
 require "rack/test"
 
-require_relative "../lib/password_manager"
+require_relative "../app"
 
-class PasswordManagerTest < Minitest::Test
+class AppTest < Minitest::Test
   include Rack::Test::Methods
 
   def app

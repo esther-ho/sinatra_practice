@@ -1,9 +1,9 @@
 require "sinatra"
 require "tilt/erubis"
 
-require_relative "database_accessor"
-require_relative "user"
-require_relative "vault"
+require_relative "lib/database_accessor"
+require_relative "lib/user"
+require_relative "lib/vault"
 
 configure do
   enable :sessions
