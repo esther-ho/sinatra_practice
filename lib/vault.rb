@@ -1,9 +1,7 @@
-class Vault
-  attr_reader :id, :name, :user_id
+require_relative "database_object"
 
-  def initialize(*options)
-    set_attributes(*options) unless options.empty?
-  end
+class Vault < DatabaseObject
+  attr_reader :id, :name, :user_id
 
   # Add a vault associated with a user based on the given user id
   def self.add(user_id, vault_name)
@@ -19,13 +17,5 @@ class Vault
     tuple = result.first
 
     new(tuple) if tuple
-  end
-
-  private
-
-  def set_attributes(options)
-    options.each do |attribute, value|
-      instance_variable_set("@#{attribute}", value)
-    end
   end
 end

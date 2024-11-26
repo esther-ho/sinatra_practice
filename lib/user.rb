@@ -1,16 +1,14 @@
 require "bcrypt"
 
+require_relative "database_object"
+
 class LoginError < StandardError; end
 class SignupError < StandardError; end
 
-class User
+class User < DatabaseObject
   include BCrypt
 
   attr_reader :errors, :id, :username, :password
-
-  def initialize(*options)
-    set_attributes(*options) unless options.empty?
-  end
 
   # If the user has an invalid username and/or passwords, raise SignupError
   # Otherwise, add the user to the database and return the `User` instance
@@ -71,12 +69,6 @@ class User
   end
 
   private
-
-  def set_attributes(options)
-    options.each do |attribute, value|
-      instance_variable_set("@#{attribute}", value)
-    end
-  end
 
   # Add error if username is not unique or has non-alphanumeric characters.
   def username_validation
