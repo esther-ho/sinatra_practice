@@ -37,35 +37,35 @@ class AppTest < Minitest::Test
     assert_includes last_response.body, %q(form action="/users" method="post")
     assert_includes last_response.body, %q(input id="username")
     assert_includes last_response.body, %q(input id="password")
-    assert_includes last_response.body, %q(input id="repeat_password")
+    assert_includes last_response.body, %q(input id="password_confirmation")
     assert_includes last_response.body, %q(button type="submit")
   end
 
   def test_sign_up_username_taken
     User.add("admin", "secret")
 
-    post "/users", { username: "admin", password: "123", repeat_password: "123" }
+    post "/users", { username: "admin", password: "123", password_confirmation: "123" }
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Username is already taken."
   end
 
   def test_sign_up_username_with_non_alphanumeric_characters
-    post "/users", { username: "admin$1  ", password: "123", repeat_password: "123" }
+    post "/users", { username: "admin$1  ", password: "123", password_confirmation: "123" }
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Username must only contain alphanumeric characters."
   end
 
   def test_sign_up_passwords_not_matching
-    post "/users", { username: "admin", password: "123", repeat_password: "456" }
+    post "/users", { username: "admin", password: "123", password_confirmation: "456" }
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Passwords do not match."
   end
 
   def test_valid_sign_up
-    post "/users", { username: "admin", password: "secret", repeat_password: "secret" }
+    post "/users", { username: "admin", password: "secret", password_confirmation: "secret" }
 
     assert_equal 200, last_response.status
     assert_equal ({id: 1, username: "admin"}), last_request.session[:user]
@@ -76,7 +76,7 @@ class AppTest < Minitest::Test
   end
 
   def test_create_vault_on_sign_up
-    post "/users", { username: "admin", password: "secret", repeat_password: "secret" }
+    post "/users", { username: "admin", password: "secret", password_confirmation: "secret" }
 
     assert_equal 200, last_response.status
 

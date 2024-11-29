@@ -38,13 +38,13 @@ end
 post "/users" do
   username = params[:username].downcase
   password = params[:password]
-  repeat_password = params[:repeat_password]
+  password_confirmation = params[:password_confirmation]
 
   begin
     user = User.create(
       username: username,
       password: password,
-      repeat_password: repeat_password
+      password_confirmation: password_confirmation
     )
   rescue SignupError => error
   end

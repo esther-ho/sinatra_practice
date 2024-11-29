@@ -81,7 +81,7 @@ class User < DatabaseObject
 
   # Add error if passwords do not match
   def password_validation
-    unless @password == @repeat_password
+    unless @password == @password_confirmation
       @errors << "Passwords do not match."
     end
   end
