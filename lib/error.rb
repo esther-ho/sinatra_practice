@@ -17,6 +17,11 @@ class Error
     errors.clone.freeze
   end
 
+  # Return `true` if there are no errors, and `false` otherwise
+  def empty?
+    errors.empty?
+  end
+
   private
 
   attr_reader :errors

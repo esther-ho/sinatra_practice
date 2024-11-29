@@ -21,4 +21,8 @@ class ErrorTest < Minitest::Test
                 "Username must only contain alphanumeric characters."]
     assert_equal ({ invalid_username: messages }), @errors.details
   end
+
+  def test_empty
+    assert Error.new.empty?
+  end
 end
