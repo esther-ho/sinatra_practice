@@ -25,4 +25,12 @@ class ErrorTest < Minitest::Test
   def test_empty
     assert Error.new.empty?
   end
+
+  def test_messages
+    @errors.add(:invalid_password, "Passwords do not match.")
+    messages = ["Username is already taken.",
+                "Username must only contain alphanumeric characters.",
+                "Passwords do not match."]
+    assert_equal messages, @errors.messages
+  end
 end

@@ -22,6 +22,11 @@ class Error
     errors.empty?
   end
 
+  # Return all error messages
+  def messages
+    errors.values.flatten
+  end
+
   private
 
   attr_reader :errors
