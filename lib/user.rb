@@ -57,6 +57,11 @@ class User < DatabaseObject
     Password.new(@password_hash) == password ? self : false
   end
 
+  # Return `true` if there are errors, and `false` otherwise
+  def error?
+    !errors.empty?
+  end
+
   # Store only the `id` and `username` of a user in a session
   def session_hash
     { id: @id, username: @username }
