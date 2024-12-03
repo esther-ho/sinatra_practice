@@ -2,7 +2,6 @@ require "bcrypt"
 
 require_relative "database_object"
 
-class LoginError < StandardError; end
 class SignupError < StandardError; end
 
 class User < DatabaseObject
@@ -25,11 +24,19 @@ class User < DatabaseObject
     find_by_username(user.username)
   end
 
-  # If the user is not found and/or passwords don't match, raise LoginError
+  # If the login credentials are invalid,
+  # return a new `User` object with its updated `Error` instance.
   # Otherwise, return the `User` instance
   def self.login(username, password)
     valid_user = find_by_username(username)&.authenticate(password)
-    raise LoginError, "Invalid username and/or password." unless valid_user
+
+    unless valid_user
+      user = new
+      user.errors.add(:invalid_login_credentials,
+                      "Invalid username and/or password.")
+      return user
+    end
+
     valid_user
   end
 
