@@ -1,10 +1,10 @@
 require "minitest/autorun"
 
-require_relative "../lib/error"
+require_relative "../lib/errors"
 
-class ErrorTest < Minitest::Test
+class ErrorsTest < Minitest::Test
   def setup
-    @errors = Error.new
+    @errors = Errors.new
     @errors.add(:invalid_username, "Username is already taken.")
     @errors.add(:invalid_username,
                 "Username must only contain alphanumeric characters.")
@@ -12,7 +12,7 @@ class ErrorTest < Minitest::Test
 
   def test_raises_error_initialize_with_argument
     assert_raises ArgumentError do
-      Error.new('Test error.')
+      Errors.new('Test error.')
     end
   end
 
@@ -23,7 +23,7 @@ class ErrorTest < Minitest::Test
   end
 
   def test_empty
-    assert Error.new.empty?
+    assert Errors.new.empty?
   end
 
   def test_messages

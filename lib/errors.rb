@@ -1,4 +1,4 @@
-class Error
+class Errors
   def initialize
     @errors = {}
   end
