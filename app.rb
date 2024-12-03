@@ -48,7 +48,7 @@ post "/users" do
 
   if user.error?
     status 422
-    session[:message] = user.errors.messages.join(' ')
+    session[:message] = user.error_messages
     erb :sign_up
   else
     Vault.add(user.id, "My Vault")
@@ -70,7 +70,7 @@ post "/users/sign-in" do
 
   if user.error?
     status 422
-    session[:message] = user.errors.messages.join(' ')
+    session[:message] = user.error_messages
     erb :sign_in
   else
     session[:user] = user.session_hash

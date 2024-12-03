@@ -64,6 +64,11 @@ class User < DatabaseObject
     !errors.empty?
   end
 
+  # Return all error messages as a string
+  def error_messages
+    errors.messages.join(' ')
+  end
+
   # Store only the `id` and `username` of a user in a session
   def session_hash
     { id: @id, username: @username }
