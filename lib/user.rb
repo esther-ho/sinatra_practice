@@ -75,8 +75,6 @@ class User < DatabaseObject
   end
 
   def validate(*attributes)
-    @errors ||= []
-
     attributes.each { |attribute| send("#{attribute}_validation") }
   end
 
@@ -85,16 +83,16 @@ class User < DatabaseObject
   # Add error if username is not unique or has non-alphanumeric characters.
   def username_validation
     if self.class.find_by_username(@username)
-      @errors << "Username is already taken."
+      errors.add(:invalid_username, "Username is already taken.")
     elsif @username =~ /[^a-zA-Z0-9]/
-      @errors << "Username must only contain alphanumeric characters."
+      errors.add(:invalid_username,
+                 "Username must only contain alphanumeric characters.")
     end
   end
 
   # Add error if passwords do not match
   def password_validation
-    unless @password == @password_confirmation
-      @errors << "Passwords do not match."
-    end
+    return if @password == @password_confirmation
+    errors.add(:invalid_password, "Passwords do not match.")
   end
 end
