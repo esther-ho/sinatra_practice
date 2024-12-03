@@ -2,34 +2,36 @@ require "bcrypt"
 
 require_relative "database_object"
 
-class LoginError < StandardError; end
-class SignupError < StandardError; end
-
 class User < DatabaseObject
   include BCrypt
 
   attr_reader :errors, :id, :username, :password
 
-  # If the user has an invalid username and/or passwords, raise SignupError
+  # If the user has an invalid username and/or passwords,
+  # return the `User` object with its updated `Error` instance.
   # Otherwise, add the user to the database and return the `User` instance
   def self.create(*options)
     user = new(*options)
     user.validate(:username, :password)
+    return user if user.error?
 
-    if user.errors.empty?
-      add(user.username, user.password)
-    else
-      raise SignupError, user.errors.join(' ')
-    end
-
+    add(user.username, user.password)
     find_by_username(user.username)
   end
 
-  # If the user is not found and/or passwords don't match, raise LoginError
+  # If the login credentials are invalid,
+  # return a new `User` object with its updated `Error` instance.
   # Otherwise, return the `User` instance
   def self.login(username, password)
     valid_user = find_by_username(username)&.authenticate(password)
-    raise LoginError, "Invalid username and/or password." unless valid_user
+
+    unless valid_user
+      user = new
+      user.errors.add(:invalid_login_credentials,
+                      "Invalid username and/or password.")
+      return user
+    end
+
     valid_user
   end
 
@@ -57,14 +59,22 @@ class User < DatabaseObject
     Password.new(@password_hash) == password ? self : false
   end
 
+  # Return `true` if there are errors, and `false` otherwise
+  def error?
+    !errors.empty?
+  end
+
+  # Return all error messages as a string
+  def error_messages
+    errors.messages.join(' ')
+  end
+
   # Store only the `id` and `username` of a user in a session
   def session_hash
     { id: @id, username: @username }
   end
 
   def validate(*attributes)
-    @errors ||= []
-
     attributes.each { |attribute| send("#{attribute}_validation") }
   end
 
@@ -73,16 +83,16 @@ class User < DatabaseObject
   # Add error if username is not unique or has non-alphanumeric characters.
   def username_validation
     if self.class.find_by_username(@username)
-      @errors << "Username is already taken."
+      errors.add(:invalid_username, "Username is already taken.")
     elsif @username =~ /[^a-zA-Z0-9]/
-      @errors << "Username must only contain alphanumeric characters."
+      errors.add(:invalid_username,
+                 "Username must only contain alphanumeric characters.")
     end
   end
 
   # Add error if passwords do not match
   def password_validation
-    unless @password == @password_confirmation
-      @errors << "Passwords do not match."
-    end
+    return if @password == @password_confirmation
+    errors.add(:invalid_password, "Passwords do not match.")
   end
 end

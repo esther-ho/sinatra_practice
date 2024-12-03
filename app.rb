@@ -40,18 +40,15 @@ post "/users" do
   password = params[:password]
   password_confirmation = params[:password_confirmation]
 
-  begin
-    user = User.create(
-      username: username,
-      password: password,
-      password_confirmation: password_confirmation
-    )
-  rescue SignupError => error
-  end
+  user = User.create(
+    username: username,
+    password: password,
+    password_confirmation: password_confirmation
+  )
 
-  if error
+  if user.error?
     status 422
-    session[:message] = error
+    session[:message] = user.error_messages
     erb :sign_up
   else
     Vault.add(user.id, "My Vault")
@@ -69,14 +66,11 @@ post "/users/sign-in" do
   username = params[:username].downcase
   password = params[:password]
 
-  begin
-    user = User.login(username, password)
-  rescue LoginError => error
-  end
+  user = User.login(username, password)
 
-  if error
+  if user.error?
     status 422
-    session[:message] = error
+    session[:message] = user.error_messages
     erb :sign_in
   else
     session[:user] = user.session_hash
