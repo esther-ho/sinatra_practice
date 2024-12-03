@@ -1,8 +1,11 @@
 require 'time'
 
+require_relative "error"
+
 class DatabaseObject
   def initialize(record = {})
     assign_attributes(record) unless record.empty?
+    @errors = Error.new
   end
 
   private
