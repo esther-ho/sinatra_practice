@@ -40,18 +40,15 @@ post "/users" do
   password = params[:password]
   password_confirmation = params[:password_confirmation]
 
-  begin
-    user = User.create(
-      username: username,
-      password: password,
-      password_confirmation: password_confirmation
-    )
-  rescue SignupError => error
-  end
+  user = User.create(
+    username: username,
+    password: password,
+    password_confirmation: password_confirmation
+  )
 
-  if error
+  if user.error?
     status 422
-    session[:message] = error
+    session[:message] = user.errors.messages.join(' ')
     erb :sign_up
   else
     Vault.add(user.id, "My Vault")
