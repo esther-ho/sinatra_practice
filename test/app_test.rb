@@ -68,7 +68,8 @@ class AppTest < Minitest::Test
     post "/users", { username: "admin", password: "secret", password_confirmation: "secret" }
 
     assert_equal 200, last_response.status
-    assert_equal ({id: 1, username: "admin"}), last_request.session[:user]
+    assert_equal 1, last_request.session[:user_id]
+    assert_equal "admin", last_request.session[:username]
 
     user = User.find_by_username("admin")
     assert user
@@ -116,6 +117,7 @@ class AppTest < Minitest::Test
     post "/users/sign-in", { username: "admin", password: "secret" }
 
     assert_equal 200, last_response.status
-    assert_equal ({id: 1, username: "admin"}), last_request.session[:user]
+    assert_equal 1, last_request.session[:user_id]
+    assert_equal "admin", last_request.session[:username]
   end
 end

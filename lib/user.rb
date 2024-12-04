@@ -69,11 +69,6 @@ class User < DatabaseObject
     errors.messages.join(' ')
   end
 
-  # Store only the `id` and `username` of a user in a session
-  def session_hash
-    { id: @id, username: @username }
-  end
-
   def validate(*attributes)
     attributes.each { |attribute| send("#{attribute}_validation") }
   end

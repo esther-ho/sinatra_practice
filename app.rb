@@ -5,6 +5,11 @@ require_relative "lib/database_accessor"
 require_relative "lib/user"
 require_relative "lib/vault"
 
+def save_user_info_in_session(user)
+  session[:user_id] = user.id
+  session[:username] = user.username
+end
+
 configure do
   enable :sessions
   set :session_secret, SecureRandom.hex(32)
@@ -52,7 +57,7 @@ post "/users" do
     erb :sign_up
   else
     Vault.add(user.id, "My Vault")
-    session[:user] = user.session_hash
+    save_user_info_in_session(user)
   end
 end
 
@@ -73,6 +78,6 @@ post "/users/sign-in" do
     session[:message] = user.error_messages
     erb :sign_in
   else
-    session[:user] = user.session_hash
+    save_user_info_in_session(user)
   end
 end
