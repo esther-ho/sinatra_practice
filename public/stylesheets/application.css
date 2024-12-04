@@ -11,7 +11,14 @@ form input[type="password"] {
   width: 70%
 }
 
-.message {
-  background-color: #FFF5DC;
+.flash-message {
+  background-color: #eacad6;
+  display: inline-flex;
   padding: 10px;
+}
+
+.flash-message p {
+  color: #b6174b;
+  font-weight: bold;
+  margin: 0;
 }
