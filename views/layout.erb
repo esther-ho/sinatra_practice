@@ -8,10 +8,14 @@
   <body>
     <header>
       <h1>Password Manager</h1>
-      <% if session[:message] %>
-        <p class="message"><%= session.delete(:message) %></p>
-      <% end %>
     </header>
+
+    <% if session[:message] %>
+      <div class="flash-message">
+        <p><%= session.delete(:message) %></p>
+      </div>
+    <% end %>
+
     <main>
       <%= yield %>
     </main>
