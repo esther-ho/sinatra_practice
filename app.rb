@@ -10,6 +10,11 @@ def save_user_info_in_session(user)
   session[:username] = user.username
 end
 
+def logged_in?(username)
+  return false unless session[:user_id] && session[:username]
+  session[:username] == username
+end
+
 configure do
   enable :sessions
   set :session_secret, SecureRandom.hex(32)
@@ -87,6 +92,7 @@ end
 # Display user homepage
 get "/:username" do
   @username = params[:username]
+  redirect "/users/sign-in" unless logged_in?(@username)
 
   erb :dashboard
 end
