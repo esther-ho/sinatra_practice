@@ -58,6 +58,7 @@ post "/users" do
   else
     Vault.add(user.id, "My Vault")
     save_user_info_in_session(user)
+    redirect "/#{user.username}"
   end
 end
 
@@ -79,5 +80,13 @@ post "/users/sign-in" do
     erb :sign_in
   else
     save_user_info_in_session(user)
+    redirect "/#{user.username}"
   end
+end
+
+# Display user homepage
+get "/:username" do
+  @username = params[:username]
+
+  erb :dashboard
 end
