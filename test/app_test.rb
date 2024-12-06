@@ -67,7 +67,9 @@ class AppTest < Minitest::Test
   def test_valid_sign_up
     post "/users", { username: "admin", password: "secret", password_confirmation: "secret" }
 
-    assert_equal 200, last_response.status
+    assert_equal 302, last_response.status
+    assert_match /\/admin$/, last_response["Location"]
+
     assert_equal 1, last_request.session[:user_id]
     assert_equal "admin", last_request.session[:username]
 
@@ -79,7 +81,8 @@ class AppTest < Minitest::Test
   def test_create_vault_on_sign_up
     post "/users", { username: "admin", password: "secret", password_confirmation: "secret" }
 
-    assert_equal 200, last_response.status
+    assert_equal 302, last_response.status
+    assert_match /\/admin$/, last_response["Location"]
 
     user = User.find_by_username("admin")
     assert Vault.find_by_vault_name(user.id, "My Vault")
@@ -116,7 +119,9 @@ class AppTest < Minitest::Test
 
     post "/users/sign-in", { username: "admin", password: "secret" }
 
-    assert_equal 200, last_response.status
+    assert_equal 302, last_response.status
+    assert_match /\/admin$/, last_response["Location"]
+
     assert_equal 1, last_request.session[:user_id]
     assert_equal "admin", last_request.session[:username]
   end
