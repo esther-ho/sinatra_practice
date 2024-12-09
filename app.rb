@@ -27,6 +27,14 @@ configure :development do
   also_reload "vault.rb"
 end
 
+set(:require_auth) do |authenticated|
+  condition do
+    if authenticated && !logged_in?(params[:username])
+      redirect "/users/sign-in"
+    end
+  end
+end
+
 before do
   DatabaseAccessor.connect(logger)
 end
@@ -90,9 +98,6 @@ post "/users/sign-in" do
 end
 
 # Display user homepage
-get "/:username" do
-  @username = params[:username]
-  redirect "/users/sign-in" unless logged_in?(@username)
-
+get "/:username", require_auth: true do
   erb :dashboard
 end
