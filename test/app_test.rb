@@ -35,7 +35,7 @@ class AppTest < Minitest::Test
   end
 
   def test_sign_up_form
-    get "/users/sign-up"
+    get "/users/signup"
 
     assert_equal 200, last_response.status
     assert_includes last_response.body, %q(form action="/users" method="post")
@@ -93,17 +93,17 @@ class AppTest < Minitest::Test
   end
 
   def test_sign_in_form
-    get "/users/sign-in"
+    get "/users/signin"
 
     assert_equal 200, last_response.status
-    assert_includes last_response.body, %q(form action="/users/sign-in" method="post")
+    assert_includes last_response.body, %q(form action="/users/signin" method="post")
     assert_includes last_response.body, %q(input id="username")
     assert_includes last_response.body, %q(input id="password")
     assert_includes last_response.body, %q(button type="submit")
   end
 
   def test_sign_in_user_not_found
-    post "/users/sign-in", { username: "developer", password: "123" }
+    post "/users/signin", { username: "developer", password: "123" }
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Invalid username and/or password."
@@ -112,7 +112,7 @@ class AppTest < Minitest::Test
   def test_sign_in_invalid_password
     User.add("admin", "secret")
 
-    post "/users/sign-in", { username: "admin", password: "sEcRET" }
+    post "/users/signin", { username: "admin", password: "sEcRET" }
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Invalid username and/or password."
@@ -121,7 +121,7 @@ class AppTest < Minitest::Test
   def test_valid_sign_in
     User.add("admin", "secret")
 
-    post "/users/sign-in", { username: "admin", password: "secret" }
+    post "/users/signin", { username: "admin", password: "secret" }
 
     assert_equal 302, last_response.status
     assert_match /\/admin$/, last_response["Location"]
@@ -134,7 +134,7 @@ class AppTest < Minitest::Test
     get "/admin"
 
     assert_equal 302, last_response.status
-    assert_match /\/users\/sign-in$/, last_response["Location"]
+    assert_match /\/users\/signin$/, last_response["Location"]
   end
 
   def test_display_user_dashboard_signed_in

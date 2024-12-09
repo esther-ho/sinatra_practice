@@ -30,7 +30,7 @@ end
 set(:require_auth) do |authenticated|
   condition do
     if authenticated && !logged_in?(params[:username])
-      redirect "/users/sign-in"
+      redirect "/users/signin"
     end
   end
 end
@@ -48,7 +48,7 @@ get "/" do
 end
 
 # Render form to sign up as a new user
-get "/users/sign-up" do
+get "/users/signup" do
   erb :sign_up
 end
 
@@ -76,12 +76,12 @@ post "/users" do
 end
 
 # Render form to sign in as an existing user
-get "/users/sign-in" do
+get "/users/signin" do
   erb :sign_in
 end
 
 # Sign in the existing user to their account
-post "/users/sign-in" do
+post "/users/signin" do
   username = params[:username].downcase
   password = params[:password]
 
