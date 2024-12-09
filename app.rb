@@ -99,3 +99,8 @@ end
 get "/:username", require_auth: true do
   erb :dashboard
 end
+
+# Render form to store a new password
+get "/:username/add_password", require_auth: true do
+  erb :new_credentials
+end
