@@ -21,6 +21,10 @@ class AppTest < Minitest::Test
     DatabaseAccessor.disconnect
   end
 
+  def admin_session
+    { "rack.session" => { user_id: 1, username: "admin" }}
+  end
+
   def test_homepage
     get "/"
 
@@ -124,5 +128,18 @@ class AppTest < Minitest::Test
 
     assert_equal 1, last_request.session[:user_id]
     assert_equal "admin", last_request.session[:username]
+  end
+
+  def test_redirect_user_if_signed_out
+    get "/admin"
+
+    assert_equal 302, last_response.status
+    assert_match /\/users\/sign-in$/, last_response["Location"]
+  end
+
+  def test_display_user_dashboard_signed_in
+    get "/admin", {}, admin_session
+
+    assert_equal 200, last_response.status
   end
 end
