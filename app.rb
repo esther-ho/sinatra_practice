@@ -3,7 +3,6 @@ require "tilt/erubis"
 
 require_relative "lib/database_accessor"
 require_relative "lib/user"
-require_relative "lib/vault"
 
 def save_user_info_in_session(user)
   session[:user_id] = user.id
@@ -69,7 +68,6 @@ post "/users" do
     session[:message] = user.error_messages
     erb :sign_up
   else
-    Vault.add(user.id, "My Vault")
     save_user_info_in_session(user)
     redirect "/#{user.username}"
   end
