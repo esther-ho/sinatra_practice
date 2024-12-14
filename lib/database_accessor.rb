@@ -20,8 +20,6 @@ class DatabaseAccessor
     sql = <<~SQL
     DELETE FROM users;
     ALTER SEQUENCE users_id_seq RESTART;
-    DELETE FROM vaults;
-    ALTER SEQUENCE vaults_id_seq RESTART;
     SQL
 
     @@db.exec(sql)
