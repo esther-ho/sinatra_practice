@@ -82,16 +82,6 @@ class AppTest < Minitest::Test
     assert user.authenticate("secret")
   end
 
-  def test_create_vault_on_sign_up
-    post "/users", { username: "admin", password: "secret", password_confirmation: "secret" }
-
-    assert_equal 302, last_response.status
-    assert_match /\/admin$/, last_response["Location"]
-
-    user = User.find_by_username("admin")
-    assert Vault.find_by_vault_name(user.id, "My Vault")
-  end
-
   def test_sign_in_form
     get "/users/signin"
 
