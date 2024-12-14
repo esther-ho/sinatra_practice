@@ -3,6 +3,7 @@ require "tilt/erubis"
 
 require_relative "lib/database_accessor"
 require_relative "lib/user"
+require_relative "lib/credentials"
 
 def save_user_info_in_session(user)
   session[:user_id] = user.id
@@ -23,7 +24,7 @@ configure :development do
   require "sinatra/reloader"
   also_reload "database_accessor.rb"
   also_reload "user.rb"
-  also_reload "vault.rb"
+  also_reload "credentials.rb"
 end
 
 set(:require_auth) do |authenticated|
