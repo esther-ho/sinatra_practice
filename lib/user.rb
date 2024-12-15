@@ -59,35 +59,57 @@ class User < DatabaseObject
     Password.new(@password_hash) == password ? self : false
   end
 
-  # Return `true` if there are errors, and `false` otherwise
-  def error?
-    !errors.empty?
-  end
-
-  # Return all error messages as a string
-  def error_messages
-    errors.messages.join(' ')
-  end
-
-  def validate(*attributes)
-    attributes.each { |attribute| send("#{attribute}_validation") }
-  end
-
   private
 
-  # Add error if username is not unique or has non-alphanumeric characters.
+  # Add error if username is not between 2 - 36 characters, or
+  # has non-alphanumeric characters
   def username_validation
-    if self.class.find_by_username(@username)
-      errors.add(:invalid_username, "Username is already taken.")
-    elsif @username =~ /[^a-zA-Z0-9]/
-      errors.add(:invalid_username,
-                 "Username must only contain alphanumeric characters.")
+    return unless username_unique?
+
+    username_errors = [
+      { regexp: "^.{2,36}$",
+        message: "Username should have between 2 and 36 characters." },
+      { regexp: "^[a-zA-Z0-9]+$",
+        message: "Username must only contain alphanumeric characters." }
+    ]
+
+    username_errors.each do |error|
+      next if username =~ /#{error[:regexp]}/
+      errors.add(:invalid_username, error[:message])
     end
   end
 
-  # Add error if passwords do not match
+  # Return `true` if username is unique, and `false` otherwise
+  # Add error if username is not unique
+  def username_unique?
+    return true unless self.class.find_by_username(username)
+    errors.add(:invalid_username, "Username is already taken.")
+    false
+  end
+
+  # Add error unless passwords are between 6-125 characters, or
+  # have at least 1 letter and number
   def password_validation
-    return if @password == @password_confirmation
+    return unless passwords_match?
+
+    password_errors = [
+      { regexp: "^.{6,125}$",
+        message: "Passwords should have between 6 and 125 characters." },
+      { regexp: "[a-zA-Z]+[0-9]+$",
+        message: "Passwords should have at least one letter and one number." }
+    ]
+
+    password_errors.each do |error|
+      next if password =~ /#{error[:regexp]}/
+      errors.add(:invalid_password, error[:message])
+    end
+  end
+
+  # Return `true` if passwords match, and `false` otherwise
+  # Add error if passwords do not match
+  def passwords_match?
+    return true if password == @password_confirmation
     errors.add(:invalid_password, "Passwords do not match.")
+    false
   end
 end

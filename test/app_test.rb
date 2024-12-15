@@ -48,28 +48,66 @@ class AppTest < Minitest::Test
   def test_sign_up_username_taken
     User.add("admin", "secret")
 
-    post "/users", { username: "admin", password: "123", password_confirmation: "123" }
+    post "/users", { username: "admin", password: "test123", password_confirmation: "test123" }
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Username is already taken."
   end
 
   def test_sign_up_username_with_non_alphanumeric_characters
-    post "/users", { username: "admin$1  ", password: "123", password_confirmation: "123" }
+    post "/users", { username: "admin$1  ", password: "test123", password_confirmation: "test123" }
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Username must only contain alphanumeric characters."
   end
 
+  def test_sign_up_username_wrong_length
+    post "/users", { username: "a", password: "test123", password_confirmation: "test123" }
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Username should have between 2 and 36 characters."
+
+    post "/users", { username: "aaaaaaaabbbbbbbbcccccccdddddddeeeeeee",
+                     password: "test123", password_confirmation: "test123"}
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Username should have between 2 and 36 characters."
+  end
+
   def test_sign_up_passwords_not_matching
-    post "/users", { username: "admin", password: "123", password_confirmation: "456" }
+    post "/users", { username: "admin", password: "test123", password_confirmation: "test456" }
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Passwords do not match."
   end
 
+  def test_sign_up_passwords_wrong_length
+    post "/users", { username: "admin", password: "t123", password_confirmation: "t123" }
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Passwords should have between 6 and 125 characters."
+
+    post "/users", { username: "admin", password: ("test" + "1" * 125),
+                     password_confirmation: ("test" + "1" * 125)}
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Passwords should have between 6 and 125 characters."
+  end
+
+  def test_sign_up_passwords_no_letters_or_numbers
+    post "/users", { username: "admin", password: "tester", password_confirmation: "tester" }
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Passwords should have at least one letter and one number."
+
+    post "/users", { username: "admin", password: "123456", password_confirmation: "123456" }
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Passwords should have at least one letter and one number."
+  end
+
   def test_valid_sign_up
-    post "/users", { username: "admin", password: "secret", password_confirmation: "secret" }
+    post "/users", { username: "admin", password: "secret123", password_confirmation: "secret123" }
 
     assert_equal 302, last_response.status
     assert_match /\/admin$/, last_response["Location"]
@@ -79,7 +117,7 @@ class AppTest < Minitest::Test
 
     user = User.find_by_username("admin")
     assert user
-    assert user.authenticate("secret")
+    assert user.authenticate("secret123")
   end
 
   def test_sign_in_form
@@ -93,25 +131,25 @@ class AppTest < Minitest::Test
   end
 
   def test_sign_in_user_not_found
-    post "/users/signin", { username: "developer", password: "123" }
+    post "/users/signin", { username: "developer", password: "test123" }
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Invalid username and/or password."
   end
 
   def test_sign_in_invalid_password
-    User.add("admin", "secret")
+    User.add("admin", "secret123")
 
-    post "/users/signin", { username: "admin", password: "sEcRET" }
+    post "/users/signin", { username: "admin", password: "sEcRET123" }
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Invalid username and/or password."
   end
 
   def test_valid_sign_in
-    User.add("admin", "secret")
+    User.add("admin", "secret123")
 
-    post "/users/signin", { username: "admin", password: "secret" }
+    post "/users/signin", { username: "admin", password: "secret123" }
 
     assert_equal 302, last_response.status
     assert_match /\/admin$/, last_response["Location"]
