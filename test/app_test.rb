@@ -61,6 +61,19 @@ class AppTest < Minitest::Test
     assert_includes last_response.body, "Username must only contain alphanumeric characters."
   end
 
+  def test_sign_up_username_wrong_length
+    post "/users", { username: "a", password: "123", password_confirmation: "123" }
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Username should have between 2 and 36 characters."
+
+    post "/users", { username: "aaaaaaaabbbbbbbbcccccccdddddddeeeeeee",
+                     password: "123", password_confirmation: "123"}
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Username should have between 2 and 36 characters."
+  end
+
   def test_sign_up_passwords_not_matching
     post "/users", { username: "admin", password: "123", password_confirmation: "456" }
 

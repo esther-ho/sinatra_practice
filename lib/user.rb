@@ -61,14 +61,30 @@ class User < DatabaseObject
 
   private
 
-  # Add error if username is not unique or has non-alphanumeric characters.
+  # Add error if username is not between 2 - 36 characters, or
+  # has non-alphanumeric characters
   def username_validation
-    if self.class.find_by_username(@username)
-      errors.add(:invalid_username, "Username is already taken.")
-    elsif @username =~ /[^a-zA-Z0-9]/
-      errors.add(:invalid_username,
-                 "Username must only contain alphanumeric characters.")
+    return unless username_unique?
+
+    username_errors = [
+      { regexp: "^.{2,36}$",
+        message: "Username should have between 2 and 36 characters." },
+      { regexp: "^[a-zA-Z0-9]+$",
+        message: "Username must only contain alphanumeric characters." }
+    ]
+
+    username_errors.each do |error|
+      next if username =~ /#{error[:regexp]}/
+      errors.add(:invalid_username, error[:message])
     end
+  end
+
+  # Return `true` if username is unique, and `false` otherwise
+  # Add error if username is not unique
+  def username_unique?
+    return true unless self.class.find_by_username(username)
+    errors.add(:invalid_username, "Username is already taken.")
+    false
   end
 
   # Add error if passwords do not match
