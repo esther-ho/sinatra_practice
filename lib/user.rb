@@ -87,9 +87,29 @@ class User < DatabaseObject
     false
   end
 
-  # Add error if passwords do not match
+  # Add error unless passwords are between 6-125 characters, or
+  # have at least 1 letter and number
   def password_validation
-    return if @password == @password_confirmation
+    return unless passwords_match?
+
+    password_errors = [
+      { regexp: "^.{6,125}$",
+        message: "Passwords should have between 6 and 125 characters." },
+      { regexp: "[a-zA-Z]+[0-9]+$",
+        message: "Passwords should have at least one letter and one number." }
+    ]
+
+    password_errors.each do |error|
+      next if password =~ /#{error[:regexp]}/
+      errors.add(:invalid_password, error[:message])
+    end
+  end
+
+  # Return `true` if passwords match, and `false` otherwise
+  # Add error if passwords do not match
+  def passwords_match?
+    return true if password == @password_confirmation
     errors.add(:invalid_password, "Passwords do not match.")
+    false
   end
 end
