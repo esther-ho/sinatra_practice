@@ -24,4 +24,16 @@ class CredentialsTest < Minitest::Test
     Credentials.new
     assert File.file?(encryption_file_path)
   end
+
+  def test_wrong_name_length
+    credentials = Credentials.new(name: "")
+    credentials.validate(:name)
+    assert credentials.error?
+    assert_equal "Name should have between 1 and 64 characters.", credentials.error_messages
+
+    credentials = Credentials.new(name: "a" * 65)
+    credentials.validate(:name)
+    assert credentials.error?
+    assert_equal "Name should have between 1 and 64 characters.", credentials.error_messages
+  end
 end

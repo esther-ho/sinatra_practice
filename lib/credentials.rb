@@ -2,6 +2,8 @@ require "openssl"
 require_relative "database_object"
 
 class Credentials < DatabaseObject
+  attr_reader :errors, :name
+
   @@cipher = OpenSSL::Cipher.new('AES-256-CBC')
 
   def initialize(*options)
@@ -26,5 +28,16 @@ class Credentials < DatabaseObject
       @@key = @@cipher.random_key
       File.write(file_path, @@key)
     end
+  end
+
+  # Add an error if the name is not between 1-64 characters
+  def name_validation
+    name_error = {
+      regexp: "^.{1,64}$",
+      message: "Name should have between 1 and 64 characters."
+    }
+
+    return if name =~ /#{name_error[:regexp]}/
+    errors.add(:invalid_name, name_error[:message])
   end
 end
