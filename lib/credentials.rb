@@ -11,6 +11,18 @@ class Credentials < DatabaseObject
     generate_key
   end
 
+  def add
+    keys = ["user_id", "name", "username", "encrypted_password", "iv", "notes"]
+    values = [@user_id, name, username, @encrypted_password, @iv, @notes]
+
+    sql = <<~SQL
+      INSERT INTO credentials (#{keys.join(', ')})
+      VALUES ($1, $2, $3, $4, $5, $6)
+      SQL
+
+    DatabaseAccessor.query(sql, *values)
+  end
+
   private
 
   def file_path
