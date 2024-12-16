@@ -36,4 +36,16 @@ class CredentialsTest < Minitest::Test
     assert credentials.error?
     assert_equal "Name should have between 1 and 64 characters.", credentials.error_messages
   end
+
+  def test_wrong_username_length
+    credentials = Credentials.new(username: "a")
+    credentials.validate(:username)
+    assert credentials.error?
+    assert_equal "Username should have between 2 and 256 characters.", credentials.error_messages
+
+    credentials = Credentials.new(username: "a" * 257)
+    credentials.validate(:username)
+    assert credentials.error?
+    assert_equal "Username should have between 2 and 256 characters.", credentials.error_messages
+  end
 end

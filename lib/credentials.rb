@@ -2,7 +2,7 @@ require "openssl"
 require_relative "database_object"
 
 class Credentials < DatabaseObject
-  attr_reader :errors, :name
+  attr_reader :errors, :name, :username
 
   @@cipher = OpenSSL::Cipher.new('AES-256-CBC')
 
@@ -39,5 +39,16 @@ class Credentials < DatabaseObject
 
     return if name =~ /#{name_error[:regexp]}/
     errors.add(:invalid_name, name_error[:message])
+  end
+
+  # Add an error if the username is not between 2-256 characters
+  def username_validation
+    username_error = {
+      regexp: "^.{2,256}$",
+      message: "Username should have between 2 and 256 characters."
+    }
+
+    return if username =~ /#{username_error[:regexp]}/
+    errors.add(:invalid_username, username_error[:message])
   end
 end
