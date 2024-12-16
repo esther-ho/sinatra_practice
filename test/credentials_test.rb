@@ -19,7 +19,7 @@ class CredentialsTest < Minitest::Test
   def teardown
     DatabaseAccessor.reset
     DatabaseAccessor.disconnect
-    FileUtils.rm(encryption_file_path)
+    FileUtils.rm_f(encryption_file_path)
   end
 
   def test_generate_key_on_instantiation
