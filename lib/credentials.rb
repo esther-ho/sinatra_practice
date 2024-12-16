@@ -22,6 +22,8 @@ class Credentials < DatabaseObject
     new(tuple) if tuple
   end
 
+  # Add a new credentials set to the `credentials` table
+  # Return the `id` of the inserted record and assign it to `@id`
   def add
     keys = ["user_id", "name", "username", "encrypted_password", "iv", "notes"]
     values = [@user_id, name, username, @encrypted_password, @iv, @notes]
@@ -29,9 +31,11 @@ class Credentials < DatabaseObject
     sql = <<~SQL
       INSERT INTO credentials (#{keys.join(', ')})
       VALUES ($1, $2, $3, $4, $5, $6)
+      RETURNING id
       SQL
 
-    DatabaseAccessor.query(sql, *values)
+    result = DatabaseAccessor.query(sql, *values)
+    @id = result.first["id"].to_i
   end
 
   private
