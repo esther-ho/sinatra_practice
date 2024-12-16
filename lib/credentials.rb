@@ -11,6 +11,17 @@ class Credentials < DatabaseObject
     generate_key
   end
 
+  # Find a record with a matching name and username
+  # If a record is found, return a `Credential` instance with the relevant data
+  # If not, return `nil`
+  def self.find_by_name_and_username(name, username)
+    sql = "SELECT * FROM credentials WHERE name = $1 AND username = $2"
+    result = DatabaseAccessor.query(sql, name, username)
+    tuple = result.first
+
+    new(tuple) if tuple
+  end
+
   def add
     keys = ["user_id", "name", "username", "encrypted_password", "iv", "notes"]
     values = [@user_id, name, username, @encrypted_password, @iv, @notes]

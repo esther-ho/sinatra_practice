@@ -74,4 +74,18 @@ class CredentialsTest < Minitest::Test
       credentials.add
     end
   end
+
+  def test_find_existing_credentials_by_name_and_username
+    credentials = Credentials.new(user_id: 1, name: "Example.com", username: "johndoe")
+    credentials.add
+    found = Credentials.find_by_name_and_username("Example.com", "johndoe")
+
+    assert_equal "Example.com", found.name
+    assert_equal "johndoe", found.username
+  end
+
+  def test_find_nonexistent_credentials
+    not_found = Credentials.find_by_name_and_username("Example.org", "johndoe")
+    assert_nil not_found
+  end
 end
