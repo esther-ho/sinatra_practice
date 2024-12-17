@@ -29,10 +29,10 @@ class Credentials < DatabaseObject
     values = [@user_id, name, username, @encrypted_password, @iv, @notes]
 
     sql = <<~SQL
-      INSERT INTO credentials (#{keys.join(', ')})
-      VALUES ($1, $2, $3, $4, $5, $6)
-      RETURNING id
-      SQL
+    INSERT INTO credentials (#{keys.join(', ')})
+    VALUES ($1, $2, $3, $4, $5, $6)
+    RETURNING id
+    SQL
 
     result = DatabaseAccessor.query(sql, *values)
     @id = result.first["id"].to_i
