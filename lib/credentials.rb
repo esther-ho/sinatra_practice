@@ -2,7 +2,7 @@ require "openssl"
 require_relative "database_object"
 
 class Credentials < DatabaseObject
-  attr_reader :errors, :name, :username
+  attr_reader :errors, :id, :name, :username
 
   @@cipher = OpenSSL::Cipher.new('AES-256-CBC')
 
@@ -36,6 +36,17 @@ class Credentials < DatabaseObject
 
     result = DatabaseAccessor.query(sql, *values)
     @id = result.first["id"].to_i
+  end
+
+  # Return `false` and update `@errors` if a record with the same name and
+  # username but with a different id is found. Return `true` otherwise.
+  def unique?
+    other = self.class.find_by_name_and_username(name, username)
+    return true unless other && other.id != id
+
+    message = "An entry with this name and username already exists."
+    errors.add(:invalid_credentials, message)
+    false
   end
 
   private

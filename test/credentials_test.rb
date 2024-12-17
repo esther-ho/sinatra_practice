@@ -88,4 +88,18 @@ class CredentialsTest < Minitest::Test
     not_found = Credentials.find_by_name_and_username("Example.org", "johndoe")
     assert_nil not_found
   end
+
+  def test_unique_credentials
+    credentials1 = Credentials.new(user_id: 1, name: "Example.com", username: "johndoe")
+    assert credentials1.unique?
+    refute credentials1.error?
+
+    credentials1.add
+    assert credentials1.unique?
+
+    credentials2 = Credentials.new(user_id: 1, name: "Example.com", username: "johndoe")
+    refute credentials2.unique?
+    assert credentials2.error?
+    assert_equal "An entry with this name and username already exists.", credentials2.error_messages
+  end
 end
