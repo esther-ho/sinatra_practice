@@ -22,9 +22,12 @@ class Credentials < DatabaseObject
     new(tuple) if tuple
   end
 
+  # Encrypt the password if it exists
   # Add a new credentials set to the `credentials` table
   # Return the `id` of the inserted record and assign it to `@id`
   def add
+    encrypt_password if @password
+
     keys = ["user_id", "name", "username", "encrypted_password", "iv", "notes"]
     values = [@user_id, name, username, @encrypted_password, @iv, @notes]
 
@@ -36,6 +39,18 @@ class Credentials < DatabaseObject
 
     result = DatabaseAccessor.query(sql, *values)
     @id = result.first["id"].to_i
+  end
+
+  # Generate an iv, and use the cipher key and iv to encrypt the password
+  # Remove `@password` and store the encrypted password in `@encrypted_password`
+  def encrypt_password
+    cipher = @@cipher
+    cipher.encrypt
+    cipher.key = @@key
+    @iv = cipher.random_iv
+
+    password = remove_instance_variable(:@password)
+    @encrypted_password = cipher.update(password) + cipher.final
   end
 
   # Return `false` and update `@errors` if a record with the same name and

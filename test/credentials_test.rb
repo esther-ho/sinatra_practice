@@ -102,4 +102,13 @@ class CredentialsTest < Minitest::Test
     assert credentials2.error?
     assert_equal "An entry with this name and username already exists.", credentials2.error_messages
   end
+
+  def test_encrypt_password
+    credentials = Credentials.new(password: "test123")
+    assert_equal "test123", credentials.instance_variable_get(:@password)
+
+    credentials.encrypt_password
+    assert_nil credentials.instance_variable_get(:@password)
+    refute_equal "test123", credentials.instance_variable_get(:@encrypted_password)
+  end
 end
