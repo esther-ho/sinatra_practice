@@ -180,6 +180,6 @@ class AppTest < Minitest::Test
     assert_includes last_response.body, %q(input id="entry_username")
     assert_includes last_response.body, %q(input id="entry_password")
     assert_includes last_response.body, %q(textarea id="entry_notes")
-    assert_includes last_response.body, %q(input type="submit")
+    assert_includes last_response.body, %q(button type="submit")
   end
 end
