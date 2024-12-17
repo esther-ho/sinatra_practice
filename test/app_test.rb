@@ -170,4 +170,16 @@ class AppTest < Minitest::Test
 
     assert_equal 200, last_response.status
   end
+
+  def test_add_new_credentials_form
+    get "/admin/passwords/add", {}, admin_session
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, %q(form action="/admin/passwords" method="post")
+    assert_includes last_response.body, %q(input id="entry_name")
+    assert_includes last_response.body, %q(input id="entry_username")
+    assert_includes last_response.body, %q(input id="entry_password")
+    assert_includes last_response.body, %q(textarea id="entry_notes")
+    assert_includes last_response.body, %q(input type="submit")
+  end
 end
