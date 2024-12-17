@@ -105,7 +105,7 @@ class Credentials < DatabaseObject
     @encrypted_password = Base64.encode64(@encrypted_password)
   end
 
-  # Add an error if the name is not between 1-64 characters
+  # Update `@errors` if the name is not between 1-64 characters
   def name_validation
     name_error = {
       regexp: "^.{1,64}$",
@@ -116,7 +116,7 @@ class Credentials < DatabaseObject
     errors.add(:invalid_name, name_error[:message])
   end
 
-  # Add an error if the username is not between 2-256 characters
+  # Update `@errors` if the username is not between 2-256 characters
   def username_validation
     username_error = {
       regexp: "^.{2,256}$",
