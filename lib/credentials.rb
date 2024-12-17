@@ -1,4 +1,5 @@
 require "openssl"
+require "base64"
 require_relative "database_object"
 
 class Credentials < DatabaseObject
@@ -43,6 +44,7 @@ class Credentials < DatabaseObject
 
   # Generate an iv, and use the cipher key and iv to encrypt the password
   # Remove `@password` and store the encrypted password in `@encrypted_password`
+  # Encode the iv and password so they can be inserted into `credentials`
   def encrypt_password
     cipher = @@cipher
     cipher.encrypt
@@ -51,6 +53,7 @@ class Credentials < DatabaseObject
 
     password = remove_instance_variable(:@password)
     @encrypted_password = cipher.update(password) + cipher.final
+    encode_iv_and_password
   end
 
   # Return `false` and update `@errors` if a record with the same name and
@@ -81,6 +84,12 @@ class Credentials < DatabaseObject
       @@key = @@cipher.random_key
       File.write(file_path, @@key)
     end
+  end
+
+  # Encode the encrypted password and iv in Base64 from the original ASCII-8BIT
+  def encode_iv_and_password
+    @iv = Base64.encode64(@iv)
+    @encrypted_password = Base64.encode64(@encrypted_password)
   end
 
   # Add an error if the name is not between 1-64 characters
