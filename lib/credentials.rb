@@ -12,6 +12,19 @@ class Credentials < DatabaseObject
     generate_key
   end
 
+  # If the credentials set is not unique or has an invalid name/username,
+  # return the `Credentials` object with the updated `Errors` instance
+  # Otherwise, add the credentials to the database and return the instance
+  def self.create(*options)
+    credentials = new(*options)
+    return credentials unless credentials.unique?
+    credentials.validate(:name, :username)
+    return credentials if credentials.error?
+
+    credentials.add
+    credentials
+  end
+
   # Find a record with a matching name and username
   # If a record is found, return a `Credential` instance with the relevant data
   # If not, return `nil`

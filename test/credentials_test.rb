@@ -111,4 +111,36 @@ class CredentialsTest < Minitest::Test
     assert_nil credentials.instance_variable_get(:@password)
     refute_equal "test123", credentials.instance_variable_get(:@encrypted_password)
   end
+
+  def test_create_valid_credentials
+    Credentials.create(user_id: 1, name: "Example.com", username: "johndoe")
+    found = Credentials.find_by_name_and_username("Example.com", "johndoe")
+    assert found
+    assert_equal "Example.com", found.name
+    assert_equal "johndoe", found.username
+  end
+
+  def test_create_credentials_with_nonunique_entry
+    Credentials.create(user_id: 1, name: "A.com", username: "test")
+    credentials = Credentials.create(user_id: 1, name: "A.com", username: "test")
+
+    assert credentials.error?
+    assert_equal "An entry with this name and username already exists.", credentials.error_messages
+  end
+
+  def test_create_credentials_with_invalid_name
+    credentials = Credentials.create(name: "", user_id: 1, username: "test")
+
+    assert credentials.error?
+    assert_equal "Name should have between 1 and 64 characters.", credentials.error_messages
+    assert_nil Credentials.find_by_name_and_username("", "test")
+  end
+
+  def test_create_credentials_with_invalid_username
+    credentials = Credentials.create(username: "a", user_id: 1, name: "A.com")
+
+    assert credentials.error?
+    assert_equal "Username should have between 2 and 256 characters.", credentials.error_messages
+    assert_nil Credentials.find_by_name_and_username("A.com", "a")
+  end
 end
