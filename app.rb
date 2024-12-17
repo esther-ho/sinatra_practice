@@ -105,3 +105,22 @@ end
 get "/:username/passwords/add", require_auth: true do
   erb :new_credentials
 end
+
+# Add a new set of credentials to the database
+post "/:username/passwords", require_auth: true do
+  credentials = Credentials.create(
+    user_id: session[:user_id],
+    name: params[:entry_name],
+    username: params[:entry_username],
+    password: params[:entry_password],
+    notes: params[:entry_notes]
+  )
+
+  if credentials.error?
+    status 422
+    session[:message] = credentials.error_messages
+    erb :new_credentials
+  else
+    redirect "/#{session[:username]}"
+  end
+end
