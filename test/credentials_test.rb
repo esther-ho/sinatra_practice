@@ -112,12 +112,27 @@ class CredentialsTest < Minitest::Test
     refute_equal "test123", credentials.instance_variable_get(:@encrypted_password)
   end
 
-  def test_create_valid_credentials
-    Credentials.create(user_id: 1, name: "Example.com", username: "johndoe")
+  def test_create_valid_credentials_with_password
+    Credentials.create(user_id: 1, name: "Example.com", username: "johndoe", password: "test123")
     found = Credentials.find_by_name_and_username("Example.com", "johndoe")
+
     assert found
     assert_equal "Example.com", found.name
     assert_equal "johndoe", found.username
+    assert found.instance_variable_get(:@encrypted_password)
+    assert found.instance_variable_get(:@iv)
+    refute_equal "test123", found.instance_variable_get(:@encrypted_password)
+  end
+
+  def test_create_valid_credentials_without_password
+    Credentials.create(user_id: 1, name: "Example.com", username: "johndoe", password: "")
+    found = Credentials.find_by_name_and_username("Example.com", "johndoe")
+
+    assert found
+    assert_equal "Example.com", found.name
+    assert_equal "johndoe", found.username
+    assert_nil found.instance_variable_get(:@encrypted_password)
+    assert_nil found.instance_variable_get(:@iv)
   end
 
   def test_create_credentials_with_nonunique_entry

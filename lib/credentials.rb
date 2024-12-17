@@ -40,7 +40,7 @@ class Credentials < DatabaseObject
   # Add a new credentials set to the `credentials` table
   # Return the `id` of the inserted record and assign it to `@id`
   def add
-    encrypt_password if @password
+    encrypt_password unless @password.nil? || @password.empty?
 
     keys = ["user_id", "name", "username", "encrypted_password", "iv", "notes"]
     values = [@user_id, name, username, @encrypted_password, @iv, @notes]
