@@ -51,7 +51,11 @@ class AppTest < Minitest::Test
   end
 
   def test_sign_up_username_taken
-    User.add("admin", "secret")
+    User.create(
+      username: "admin",
+      password: "secret123",
+      password_confirmation: "secret123"
+      )
 
     post "/users", { username: "admin", password: "test123", password_confirmation: "test123" }
 
@@ -143,7 +147,11 @@ class AppTest < Minitest::Test
   end
 
   def test_sign_in_invalid_password
-    User.add("admin", "secret123")
+    User.create(
+      username: "admin",
+      password: "secret123",
+      password_confirmation: "secret123"
+      )
 
     post "/users/signin", { username: "admin", password: "sEcRET123" }
 
@@ -152,7 +160,11 @@ class AppTest < Minitest::Test
   end
 
   def test_valid_sign_in
-    User.add("admin", "secret123")
+    User.create(
+      username: "admin",
+      password: "secret123",
+      password_confirmation: "secret123"
+      )
 
     post "/users/signin", { username: "admin", password: "secret123" }
 
@@ -190,7 +202,12 @@ class AppTest < Minitest::Test
 
   def test_add_new_credentials_with_invalid_name
     credentials = { entry_name: "", entry_username: "johndoe" }
-    User.add("admin", "test123")
+
+    User.create(
+      username: "admin",
+      password: "test123",
+      password_confirmation: "test123"
+      )
 
     post "/admin/passwords", credentials, admin_session
 
@@ -200,7 +217,12 @@ class AppTest < Minitest::Test
 
   def test_add_credentials_with_invalid_username
     credentials = { entry_name: "Example.com", entry_username: "a" }
-    User.add("admin", "test123")
+
+    User.create(
+      username: "admin",
+      password: "test123",
+      password_confirmation: "test123"
+      )
 
     post "/admin/passwords", credentials, admin_session
 
@@ -210,7 +232,12 @@ class AppTest < Minitest::Test
 
   def test_add_nonunique_credentials
     credentials = { entry_name: "Example.com", entry_username: "johndoe" }
-    User.add("admin", "test123")
+
+    User.create(
+      username: "admin",
+      password: "test123",
+      password_confirmation: "test123"
+      )
 
     post "/admin/passwords", credentials, admin_session
     post "/admin/passwords", credentials, admin_session
@@ -221,7 +248,12 @@ class AppTest < Minitest::Test
 
   def test_add_valid_new_credentials
     credentials = { entry_name: "Example.com", entry_username: "johndoe" }
-    User.add("admin", "test123")
+
+    User.create(
+      username: "admin",
+      password: "test123",
+      password_confirmation: "test123"
+      )
 
     post "/admin/passwords", credentials, admin_session
 

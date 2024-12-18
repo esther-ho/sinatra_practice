@@ -9,7 +9,10 @@ require_relative "../lib/user"
 class CredentialsTest < Minitest::Test
   def setup
     DatabaseAccessor.connect
-    User.add("johndoe", "test123")
+    User.create(
+      username: "johndoe",
+      password: "test123",
+      password_confirmation: "test123")
   end
 
   def encryption_file_path

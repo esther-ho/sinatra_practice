@@ -5,7 +5,7 @@ require_relative "database_object"
 class User < DatabaseObject
   include BCrypt
 
-  attr_reader :errors, :id, :username, :password
+  attr_reader :errors, :id, :username
 
   # If the user has an invalid username and/or passwords,
   # return the `User` object with its updated `Error` instance.
@@ -15,8 +15,8 @@ class User < DatabaseObject
     user.validate(:username, :password)
     return user if user.error?
 
-    add(user.username, user.password)
-    find_by_username(user.username)
+    user.add
+    user
   end
 
   # If the login credentials are invalid,
@@ -36,11 +36,16 @@ class User < DatabaseObject
   end
 
   # Add a new user to the `users` table
-  def self.add(username, password)
-    password_hash = Password.create(password)
+  def add
+    hash_password
 
-    sql = "INSERT INTO users (username, password_hash) VALUES ($1, $2)"
-    DatabaseAccessor.query(sql, username, password_hash)
+    sql = <<~SQL
+    INSERT INTO users (username, password_hash) VALUES ($1, $2)
+    RETURNING id
+    SQL
+
+    result = DatabaseAccessor.query(sql, username, @password_hash)
+    @id = result.first["id"].to_i
   end
 
   # Find a user from the `users` table based on the given username
@@ -60,6 +65,12 @@ class User < DatabaseObject
   end
 
   private
+
+  def hash_password
+    remove_instance_variable(:@password_confirmation)
+    password = remove_instance_variable(:@password)
+    @password_hash = Password.create(password)
+  end
 
   # Add error if username is not between 2 - 36 characters, or
   # has non-alphanumeric characters
@@ -100,7 +111,7 @@ class User < DatabaseObject
     ]
 
     password_errors.each do |error|
-      next if password =~ /#{error[:regexp]}/
+      next if @password =~ /#{error[:regexp]}/
       errors.add(:invalid_password, error[:message])
     end
   end
@@ -108,7 +119,7 @@ class User < DatabaseObject
   # Return `true` if passwords match, and `false` otherwise
   # Add error if passwords do not match
   def passwords_match?
-    return true if password == @password_confirmation
+    return true if @password == @password_confirmation
     errors.add(:invalid_password, "Passwords do not match.")
     false
   end
