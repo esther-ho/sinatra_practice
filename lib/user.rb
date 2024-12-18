@@ -16,7 +16,7 @@ class User < DatabaseObject
     return user if user.error?
 
     user.add
-    find_by_username(user.username)
+    user
   end
 
   # If the login credentials are invalid,
@@ -39,8 +39,13 @@ class User < DatabaseObject
   def add
     hash_password
 
-    sql = "INSERT INTO users (username, password_hash) VALUES ($1, $2)"
-    DatabaseAccessor.query(sql, username, @password_hash)
+    sql = <<~SQL
+    INSERT INTO users (username, password_hash) VALUES ($1, $2)
+    RETURNING id
+    SQL
+
+    result = DatabaseAccessor.query(sql, username, @password_hash)
+    @id = result.first["id"].to_i
   end
 
   # Find a user from the `users` table based on the given username
