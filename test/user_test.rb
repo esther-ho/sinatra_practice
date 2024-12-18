@@ -18,29 +18,44 @@ class UserTest < Minitest::Test
   def test_add_user
     assert_nil User.find_by_username("admin")
 
-    User.add("admin", "123")
-    user = User.find_by_username("admin")
+    user = User.create(
+      username: "admin",
+      password: "test123",
+      password_confirmation: "test123"
+      )
 
     assert user
-    assert user.authenticate("123")
+    assert user.authenticate("test123")
   end
 
   def test_add_duplicate_user
-    User.add("admin", "123")
+    User.new(
+      username: "admin",
+      password: "test123",
+      password_confirmation: "test123"
+      ).add
 
     assert_raises PG::UniqueViolation do
-      User.add("admin", "345")
+      User.new(
+        username: "admin",
+        password: "test456",
+        password_confirmation: "test456"
+        ).add
     end
   end
 
   def test_find_user
-    User.add("admin", "123")
+    User.new(
+      username: "admin",
+      password: "test123",
+      password_confirmation: "test123"
+      ).add
 
     user = User.find_by_username("admin")
 
     assert user
     assert_equal "admin", user.username
-    assert user.authenticate("123")
+    assert user.authenticate("test123")
   end
 
   def test_find_nonexistent_user

@@ -15,7 +15,7 @@ class User < DatabaseObject
     user.validate(:username, :password)
     return user if user.error?
 
-    add(user.username, user.password)
+    user.add
     find_by_username(user.username)
   end
 
@@ -36,11 +36,11 @@ class User < DatabaseObject
   end
 
   # Add a new user to the `users` table
-  def self.add(username, password)
-    password_hash = Password.create(password)
+  def add
+    hash_password
 
     sql = "INSERT INTO users (username, password_hash) VALUES ($1, $2)"
-    DatabaseAccessor.query(sql, username, password_hash)
+    DatabaseAccessor.query(sql, username, @password_hash)
   end
 
   # Find a user from the `users` table based on the given username
@@ -60,6 +60,12 @@ class User < DatabaseObject
   end
 
   private
+
+  def hash_password
+    remove_instance_variable(:@password_confirmation)
+    password = remove_instance_variable(:@password)
+    @password_hash = Password.create(password)
+  end
 
   # Add error if username is not between 2 - 36 characters, or
   # has non-alphanumeric characters
