@@ -5,7 +5,7 @@ require_relative "database_object"
 class User < DatabaseObject
   include BCrypt
 
-  attr_reader :errors, :id, :username, :password
+  attr_reader :errors, :id, :username
 
   # If the user has an invalid username and/or passwords,
   # return the `User` object with its updated `Error` instance.
@@ -106,7 +106,7 @@ class User < DatabaseObject
     ]
 
     password_errors.each do |error|
-      next if password =~ /#{error[:regexp]}/
+      next if @password =~ /#{error[:regexp]}/
       errors.add(:invalid_password, error[:message])
     end
   end
@@ -114,7 +114,7 @@ class User < DatabaseObject
   # Return `true` if passwords match, and `false` otherwise
   # Add error if passwords do not match
   def passwords_match?
-    return true if password == @password_confirmation
+    return true if @password == @password_confirmation
     errors.add(:invalid_password, "Passwords do not match.")
     false
   end
