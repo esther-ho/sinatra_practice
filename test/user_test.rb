@@ -29,11 +29,11 @@ class UserTest < Minitest::Test
   end
 
   def test_add_duplicate_user
-    User.new(
+    User.create(
       username: "admin",
       password: "test123",
       password_confirmation: "test123"
-      ).add
+      )
 
     assert_raises PG::UniqueViolation do
       User.new(
@@ -45,11 +45,11 @@ class UserTest < Minitest::Test
   end
 
   def test_find_user
-    User.new(
+    User.create(
       username: "admin",
       password: "test123",
       password_confirmation: "test123"
-      ).add
+      )
 
     user = User.find_by_username("admin")
 
