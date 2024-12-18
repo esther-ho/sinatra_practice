@@ -170,4 +170,57 @@ class AppTest < Minitest::Test
 
     assert_equal 200, last_response.status
   end
+
+  def test_add_new_credentials_form
+    get "/admin/passwords/add", {}, admin_session
+
+    assert_equal 200, last_response.status
+    assert_includes last_response.body, %q(form action="/admin/passwords" method="post")
+    assert_includes last_response.body, %q(input id="entry_name")
+    assert_includes last_response.body, %q(input id="entry_username")
+    assert_includes last_response.body, %q(input id="entry_password")
+    assert_includes last_response.body, %q(textarea id="entry_notes")
+    assert_includes last_response.body, %q(button type="submit")
+  end
+
+  def test_add_new_credentials_with_invalid_name
+    credentials = { entry_name: "", entry_username: "johndoe" }
+    User.add("admin", "test123")
+
+    post "/admin/passwords", credentials, admin_session
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Name should have between 1 and 64 characters."
+  end
+
+  def test_add_credentials_with_invalid_username
+    credentials = { entry_name: "Example.com", entry_username: "a" }
+    User.add("admin", "test123")
+
+    post "/admin/passwords", credentials, admin_session
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "Username should have between 2 and 256 characters."
+  end
+
+  def test_add_nonunique_credentials
+    credentials = { entry_name: "Example.com", entry_username: "johndoe" }
+    User.add("admin", "test123")
+
+    post "/admin/passwords", credentials, admin_session
+    post "/admin/passwords", credentials, admin_session
+
+    assert_equal 422, last_response.status
+    assert_includes last_response.body, "An entry with this name and username already exists."
+  end
+
+  def test_add_valid_new_credentials
+    credentials = { entry_name: "Example.com", entry_username: "johndoe" }
+    User.add("admin", "test123")
+
+    post "/admin/passwords", credentials, admin_session
+
+    assert_equal 302, last_response.status
+    assert_match /\/admin$/, last_response["Location"]
+  end
 end

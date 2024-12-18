@@ -1,2 +1,5 @@
 # Ignore rubocop file
 .rubocop.yml
+
+# Ignore encryption key file
+lib/encryption_key.yml
