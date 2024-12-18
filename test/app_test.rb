@@ -19,6 +19,11 @@ class AppTest < Minitest::Test
   def teardown
     DatabaseAccessor.reset
     DatabaseAccessor.disconnect
+    FileUtils.rm_f(encryption_file_path)
+  end
+
+  def encryption_file_path
+    File.expand_path("encryption_key.yml", __dir__)
   end
 
   def admin_session
