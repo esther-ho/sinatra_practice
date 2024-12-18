@@ -17,7 +17,7 @@ class DatabaseAccessorTest < Minitest::Test
   end
 
   def test_delete_all_data
-    User.add("admin", "123")
+    User.create(username: "admin", password: "test123", password_confirmation: "test123")
     Credentials.new(user_id: 1, name: "Example.com", username: "johndoe").add
 
     user1 = User.find_by_username("admin")
@@ -34,7 +34,7 @@ class DatabaseAccessorTest < Minitest::Test
     assert_nil User.find_by_username("admin")
     assert_nil Credentials.find_by_name_and_username("Example.com", "johndoe")
 
-    User.add("developer", "123")
+    User.create(username: "developer", password: "test123", password_confirmation: "test123")
     Credentials.new(user_id: 1, name: "Example.org", username: "johndoe").add
 
     user2 = User.find_by_username("developer")
