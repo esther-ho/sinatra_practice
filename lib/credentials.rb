@@ -36,6 +36,17 @@ class Credentials < DatabaseObject
     new(tuple) if tuple
   end
 
+  # Find all matching records of credentials associated with the given user id
+  # Return an array of `Credentials` instances
+  def self.find_all_by_user_id(user_id)
+    sql = "SELECT * FROM credentials WHERE user_id = $1"
+    result = DatabaseAccessor.query(sql, user_id)
+
+    result.each_with_object([]) do |record, array|
+      array << new(record)
+    end
+  end
+
   # Encrypt the password if it exists
   # Add a new credentials set to the `credentials` table
   # Return the `id` of the inserted record and assign it to `@id`
