@@ -4,7 +4,8 @@ CREATE TABLE IF NOT EXISTS users (
   password_hash text NOT NULL,
   created_at timestamp NOT NULL DEFAULT now(),
   updated_at timestamp NOT NULL DEFAULT now(),
-  UNIQUE (username, password_hash)
+  CHECK (length(username) BETWEEN 2 AND 36),
+  CHECK (username ~* '^[a-z0-9]+$')
 );
 
 CREATE TABLE IF NOT EXISTS credentials (
@@ -15,7 +16,7 @@ CREATE TABLE IF NOT EXISTS credentials (
   encrypted_password text,
   iv text,
   notes text,
-  UNIQUE(name, username),
+  UNIQUE (name, username),
   CHECK (length(name) BETWEEN 1 AND 64),
   CHECK (length(username) BETWEEN 2 AND 256)
 );

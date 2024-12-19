@@ -44,6 +44,16 @@ class UserTest < Minitest::Test
     end
   end
 
+  def test_add_user_with_invalid_username
+    assert_raises PG::CheckViolation do
+      User.new(
+        username: "@dmin",
+        password: "test123",
+        password_confirmation: "test123"
+      ).add
+    end
+  end
+
   def test_find_user
     User.create(
       username: "admin",
