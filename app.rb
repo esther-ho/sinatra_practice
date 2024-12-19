@@ -97,7 +97,7 @@ end
 
 # Display all credentials stored by the user
 get "/passwords", require_auth: true do
-  erb :dashboard
+  erb :credentials_list
 end
 
 # Render form to store a new set of credentials
