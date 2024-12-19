@@ -26,7 +26,7 @@ class Credentials < DatabaseObject
   end
 
   # Find a record with a matching name and username
-  # If a record is found, return a `Credential` instance with the relevant data
+  # If a record is found, return a `Credentials` instance with the relevant data
   # If not, return `nil`
   def self.find_by_name_and_username(name, username)
     sql = "SELECT * FROM credentials WHERE name = $1 AND username = $2"
