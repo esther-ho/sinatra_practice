@@ -97,6 +97,7 @@ end
 
 # Display all credentials stored by the user
 get "/passwords", require_auth: true do
+  @credentials_list = Credentials.find_all_by_user_id(session[:user_id])
   erb :credentials_list
 end
 

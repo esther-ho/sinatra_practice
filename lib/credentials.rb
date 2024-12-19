@@ -3,7 +3,7 @@ require "base64"
 require_relative "database_object"
 
 class Credentials < DatabaseObject
-  attr_reader :errors, :id, :name, :username
+  attr_reader :errors, :id, :name, :username, :notes, :created_at, :updated_at
 
   @@cipher = OpenSSL::Cipher.new('AES-256-CBC')
 
