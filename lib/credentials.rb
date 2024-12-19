@@ -80,6 +80,19 @@ class Credentials < DatabaseObject
     encode_iv_and_password
   end
 
+  # Decode the encoded iv and encrypted password
+  # Decrypt the encrypted password using the key and associated iv
+  # Return the decrypted password but do not store it in a variable
+  def decrypt_password
+    decode_iv_and_password
+    decipher = @@cipher
+    decipher.decrypt
+    decipher.key = @@key
+    decipher.iv = @iv
+
+    decipher.update(@encrypted_password) + decipher.final
+  end
+
   # Return `false` and update `@errors` if a record with the same name and
   # username but with a different id is found. Return `true` otherwise.
   def unique?
@@ -114,6 +127,12 @@ class Credentials < DatabaseObject
   def encode_iv_and_password
     @iv = Base64.encode64(@iv)
     @encrypted_password = Base64.encode64(@encrypted_password)
+  end
+
+  # Decode the encoded encrypted password and iv to the original ASCII-8BIT
+  def decode_iv_and_password
+    @iv = Base64.decode64(@iv)
+    @encrypted_password = Base64.decode64(@encrypted_password)
   end
 
   # Update `@errors` if the name is not between 1-64 characters
