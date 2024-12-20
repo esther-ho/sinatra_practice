@@ -84,6 +84,8 @@ class Credentials < DatabaseObject
   # Decrypt the encrypted password using the key and associated iv
   # Return the decrypted password but do not store it in a variable
   def decrypt_password
+    return nil unless @encrypted_password && @iv
+
     decode_iv_and_password
     decipher = @@cipher
     decipher.decrypt
