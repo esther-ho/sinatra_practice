@@ -23,6 +23,10 @@ helpers do
       "<p>#{paragraph}</p>"
     end.join
   end
+
+  def sort_credentials(credentials)
+    credentials.sort_by(&:id)
+  end
 end
 
 def save_user_info_in_session(user)
