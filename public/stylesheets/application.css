@@ -57,3 +57,7 @@ form textarea {
 #credentials-list td {
     padding: 12px 15px;
 }
+
+.overflow {
+  width: 40%;
+}
