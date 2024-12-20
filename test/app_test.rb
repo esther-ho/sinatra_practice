@@ -119,7 +119,7 @@ class AppTest < Minitest::Test
     post "/users", { username: "admin", password: "secret123", password_confirmation: "secret123" }
 
     assert_equal 302, last_response.status
-    assert_match /\/admin$/, last_response["Location"]
+    assert_match /\/passwords$/, last_response["Location"]
 
     assert_equal 1, last_request.session[:user_id]
     assert_equal "admin", last_request.session[:username]
@@ -169,30 +169,30 @@ class AppTest < Minitest::Test
     post "/users/signin", { username: "admin", password: "secret123" }
 
     assert_equal 302, last_response.status
-    assert_match /\/admin$/, last_response["Location"]
+    assert_match /\/passwords$/, last_response["Location"]
 
     assert_equal 1, last_request.session[:user_id]
     assert_equal "admin", last_request.session[:username]
   end
 
   def test_redirect_user_if_signed_out
-    get "/admin"
+    get "/passwords"
 
     assert_equal 302, last_response.status
     assert_match /\/users\/signin$/, last_response["Location"]
   end
 
   def test_display_user_dashboard_signed_in
-    get "/admin", {}, admin_session
+    get "/passwords", {}, admin_session
 
     assert_equal 200, last_response.status
   end
 
   def test_add_new_credentials_form
-    get "/admin/passwords/add", {}, admin_session
+    get "/passwords/add", {}, admin_session
 
     assert_equal 200, last_response.status
-    assert_includes last_response.body, %q(form action="/admin/passwords" method="post")
+    assert_includes last_response.body, %q(form action="/passwords" method="post")
     assert_includes last_response.body, %q(input id="entry_name")
     assert_includes last_response.body, %q(input id="entry_username")
     assert_includes last_response.body, %q(input id="entry_password")
@@ -209,7 +209,7 @@ class AppTest < Minitest::Test
       password_confirmation: "test123"
       )
 
-    post "/admin/passwords", credentials, admin_session
+    post "/passwords", credentials, admin_session
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Name should have between 1 and 64 characters."
@@ -224,7 +224,7 @@ class AppTest < Minitest::Test
       password_confirmation: "test123"
       )
 
-    post "/admin/passwords", credentials, admin_session
+    post "/passwords", credentials, admin_session
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "Username should have between 2 and 256 characters."
@@ -239,8 +239,8 @@ class AppTest < Minitest::Test
       password_confirmation: "test123"
       )
 
-    post "/admin/passwords", credentials, admin_session
-    post "/admin/passwords", credentials, admin_session
+    post "/passwords", credentials, admin_session
+    post "/passwords", credentials, admin_session
 
     assert_equal 422, last_response.status
     assert_includes last_response.body, "An entry with this name and username already exists."
@@ -255,9 +255,9 @@ class AppTest < Minitest::Test
       password_confirmation: "test123"
       )
 
-    post "/admin/passwords", credentials, admin_session
+    post "/passwords", credentials, admin_session
 
     assert_equal 302, last_response.status
-    assert_match /\/admin$/, last_response["Location"]
+    assert_match /\/passwords$/, last_response["Location"]
   end
 end

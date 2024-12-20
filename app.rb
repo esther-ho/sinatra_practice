@@ -5,14 +5,37 @@ require_relative "lib/database_accessor"
 require_relative "lib/user"
 require_relative "lib/credentials"
 
+SECONDS_PER_MIN = 60
+MINUTES_PER_HOUR = 60
+HOURS_PER_DAY = 24
+
+helpers do
+  def display_date(date_time)
+    date_time.strftime("%e %b %Y")
+  end
+
+  def display_time(date_time)
+    date_time.strftime("%l:%M %P")
+  end
+
+  def in_paragraphs(text)
+    text.split("\r\n").map do |paragraph|
+      "<p>#{paragraph}</p>"
+    end.join
+  end
+
+  def sort_credentials(credentials)
+    credentials.sort_by(&:id)
+  end
+end
+
 def save_user_info_in_session(user)
   session[:user_id] = user.id
   session[:username] = user.username
 end
 
-def logged_in?(username)
-  return false unless session[:user_id] && session[:username]
-  session[:username] == username
+def logged_in?
+  session[:user_id] && session[:username]
 end
 
 configure do
@@ -29,7 +52,7 @@ end
 
 set(:require_auth) do |authenticated|
   condition do
-    if authenticated && !logged_in?(params[:username])
+    if authenticated && !logged_in?
       redirect "/users/signin"
     end
   end
@@ -70,7 +93,7 @@ post "/users" do
     erb :sign_up
   else
     save_user_info_in_session(user)
-    redirect "/#{user.username}"
+    redirect "/passwords"
   end
 end
 
@@ -92,22 +115,23 @@ post "/users/signin" do
     erb :sign_in
   else
     save_user_info_in_session(user)
-    redirect "/#{user.username}"
+    redirect "/passwords"
   end
 end
 
-# Display user homepage
-get "/:username", require_auth: true do
-  erb :dashboard
+# Display all credentials stored by the user
+get "/passwords", require_auth: true do
+  @credentials_list = Credentials.find_all_by_user_id(session[:user_id])
+  erb :credentials_list
 end
 
 # Render form to store a new set of credentials
-get "/:username/passwords/add", require_auth: true do
+get "/passwords/add", require_auth: true do
   erb :new_credentials
 end
 
 # Add a new set of credentials to the database
-post "/:username/passwords", require_auth: true do
+post "/passwords", require_auth: true do
   credentials = Credentials.create(
     user_id: session[:user_id],
     name: params[:entry_name],
@@ -121,6 +145,6 @@ post "/:username/passwords", require_auth: true do
     session[:message] = credentials.error_messages
     erb :new_credentials
   else
-    redirect "/#{session[:username]}"
+    redirect "/passwords"
   end
 end

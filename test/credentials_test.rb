@@ -161,4 +161,43 @@ class CredentialsTest < Minitest::Test
     assert_equal "Username should have between 2 and 256 characters.", credentials.error_messages
     assert_nil Credentials.find_by_name_and_username("A.com", "a")
   end
+
+  def test_find_all_entries_by_user_id
+    Credentials.create(user_id: 1, name: "Google", username: "johndoe")
+    Credentials.create(user_id: 1, name: "Mozilla", username: "johndoe" )
+
+    credentials_arr = Credentials.find_all_by_user_id(1)
+    assert_equal 2, credentials_arr.size
+
+    assert_equal "Google", credentials_arr.first.name
+    assert_equal "johndoe", credentials_arr.first.username
+
+    assert_equal "Mozilla", credentials_arr.last.name
+    assert_equal "johndoe", credentials_arr.last.username
+  end
+
+  def test_find_entries_for_nonexistent_user_id
+    assert_equal 0, Credentials.find_all_by_user_id(2).size
+  end
+
+  def test_decrypt_encrypted_password
+    credentials = Credentials.create(
+      user_id: 1,
+      name: "Test",
+      username: "johndoe",
+      password: "test123"
+      )
+
+    assert_equal "test123", credentials.decrypt_password
+  end
+
+  def test_decrypt_nonexisting_password
+    credentials = Credentials.create(
+      user_id: 1,
+      name: "Test",
+      username: "johndoe"
+    )
+
+    assert_nil credentials.decrypt_password
+  end
 end

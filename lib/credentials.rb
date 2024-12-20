@@ -3,7 +3,7 @@ require "base64"
 require_relative "database_object"
 
 class Credentials < DatabaseObject
-  attr_reader :errors, :id, :name, :username
+  attr_reader :errors, :id, :name, :username, :notes, :created_at, :updated_at
 
   @@cipher = OpenSSL::Cipher.new('AES-256-CBC')
 
@@ -26,7 +26,7 @@ class Credentials < DatabaseObject
   end
 
   # Find a record with a matching name and username
-  # If a record is found, return a `Credential` instance with the relevant data
+  # If a record is found, return a `Credentials` instance with the relevant data
   # If not, return `nil`
   def self.find_by_name_and_username(name, username)
     sql = "SELECT * FROM credentials WHERE name = $1 AND username = $2"
@@ -34,6 +34,17 @@ class Credentials < DatabaseObject
     tuple = result.first
 
     new(tuple) if tuple
+  end
+
+  # Find all matching records of credentials associated with the given user id
+  # Return an array of `Credentials` instances
+  def self.find_all_by_user_id(user_id)
+    sql = "SELECT * FROM credentials WHERE user_id = $1"
+    result = DatabaseAccessor.query(sql, user_id)
+
+    result.each_with_object([]) do |record, array|
+      array << new(record)
+    end
   end
 
   # Encrypt the password if it exists
@@ -67,6 +78,21 @@ class Credentials < DatabaseObject
     password = remove_instance_variable(:@password)
     @encrypted_password = cipher.update(password) + cipher.final
     encode_iv_and_password
+  end
+
+  # Decode the encoded iv and encrypted password
+  # Decrypt the encrypted password using the key and associated iv
+  # Return the decrypted password but do not store it in a variable
+  def decrypt_password
+    return nil unless @encrypted_password && @iv
+
+    decode_iv_and_password
+    decipher = @@cipher
+    decipher.decrypt
+    decipher.key = @@key
+    decipher.iv = @iv
+
+    decipher.update(@encrypted_password) + decipher.final
   end
 
   # Return `false` and update `@errors` if a record with the same name and
@@ -103,6 +129,12 @@ class Credentials < DatabaseObject
   def encode_iv_and_password
     @iv = Base64.encode64(@iv)
     @encrypted_password = Base64.encode64(@encrypted_password)
+  end
+
+  # Decode the encoded encrypted password and iv to the original ASCII-8BIT
+  def decode_iv_and_password
+    @iv = Base64.decode64(@iv)
+    @encrypted_password = Base64.decode64(@encrypted_password)
   end
 
   # Update `@errors` if the name is not between 1-64 characters
