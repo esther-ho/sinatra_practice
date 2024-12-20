@@ -34,3 +34,26 @@ form textarea {
   margin-top: 2px;
   font-size: 0.9em;
 }
+
+#credentials-list {
+  border-collapse: collapse;
+  width: 100%;
+  table-layout: fixed;
+  margin: 25px 0;
+  min-width: 1200px;
+  box-shadow: 0 0 5px #cecece;
+}
+
+#credentials-list thead tr {
+  background-color: #c1c1c1;
+  text-align: left;
+}
+
+#credentials-list tbody tr:not(:last-child) {
+  border-bottom: 3px solid #e9e9e9;
+}
+
+#credentials-list th,
+#credentials-list td {
+    padding: 12px 15px;
+}
