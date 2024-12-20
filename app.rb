@@ -5,6 +5,20 @@ require_relative "lib/database_accessor"
 require_relative "lib/user"
 require_relative "lib/credentials"
 
+SECONDS_PER_MIN = 60
+MINUTES_PER_HOUR = 60
+HOURS_PER_DAY = 24
+
+helpers do
+  def display_date(date_time)
+    date_time.strftime("%e %b %Y")
+  end
+
+  def display_time(date_time)
+    date_time.strftime("%l:%M %P")
+  end
+end
+
 def save_user_info_in_session(user)
   session[:user_id] = user.id
   session[:username] = user.username
