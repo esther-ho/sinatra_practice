@@ -23,3 +23,14 @@ form textarea {
   font-weight: bold;
   margin: 0;
 }
+
+.date {
+  color: #535353;
+  font-weight: bold;
+}
+
+.time {
+  display: block;
+  margin-top: 2px;
+  font-size: 0.9em;
+}
