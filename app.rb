@@ -17,6 +17,12 @@ helpers do
   def display_time(date_time)
     date_time.strftime("%l:%M %P")
   end
+
+  def in_paragraphs(text)
+    text.split("\r\n").map do |paragraph|
+      "<p>#{paragraph}</p>"
+    end.join
+  end
 end
 
 def save_user_info_in_session(user)
