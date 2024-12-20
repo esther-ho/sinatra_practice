@@ -179,4 +179,25 @@ class CredentialsTest < Minitest::Test
   def test_find_entries_for_nonexistent_user_id
     assert_equal 0, Credentials.find_all_by_user_id(2).size
   end
+
+  def test_decrypt_encrypted_password
+    credentials = Credentials.create(
+      user_id: 1,
+      name: "Test",
+      username: "johndoe",
+      password: "test123"
+      )
+
+    assert_equal "test123", credentials.decrypt_password
+  end
+
+  def test_decrypt_nonexisting_password
+    credentials = Credentials.create(
+      user_id: 1,
+      name: "Test",
+      username: "johndoe"
+    )
+
+    assert_nil credentials.decrypt_password
+  end
 end
